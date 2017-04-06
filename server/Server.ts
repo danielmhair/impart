@@ -140,9 +140,17 @@ export class Server {
    */
   public initRoutes(): void {
     // this.app.use('/app', express.static(path.join(__dirname, '../dist')));
-    this.app.get('/healthcheck', (req, res) => { res.json({}) });
+    this.app.set("view options", {layout: false});
+    this.app.engine('html', ejs.renderFile);
+    this.app.set('view engine', 'html');
+    this.app.use(express.static('../app/build'));
+
+    const env = this.app.get('env');
+    this.app.use(favicon(path.join(ServerSettings.root, 'apps', 'home', 'favicon.ico')));
+
     this.app.use('/api/users', UserApi);
     this.app.use('/auth', AuthApi);
+
     this.app.route('/:url(node_modules|assets|server|src)/*')
     .get(Server.PageNotFound404);
   }

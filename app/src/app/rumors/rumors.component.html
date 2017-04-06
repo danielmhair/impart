@@ -12,16 +12,20 @@
     <md-list class="list-group">
       <md-list-item>
         <div class="col-lg-4">
-          <md-input type="text"
-                    name="anonymousOriginator"
-                    placeholder="Your Name"
-                    [formControl]="anonymousOriginator"></md-input>
+          <md-input-container>
+            <input type="text"
+                   name="anonymousOriginator"
+                   placeholder="Your Name"
+                   [formControl]="anonymousOriginator" />
+          </md-input-container>
         </div>
         <div class="col-lg-4">
-          <md-input type="text"
+          <md-input-container>
+            <input type="text"
                     name="anonymousEndpoint"
                     placeholder="Endpoint"
-                    [formControl]="anonymousEndpoint"></md-input>
+                    [formControl]="anonymousEndpoint" />
+          </md-input-container>
         </div>
         <div class="col-lg-4">
           <button md-icon-button
@@ -35,11 +39,13 @@
     <md-list class="list-group" *ngIf="rumorsResult.rumors">
       <md-list-item>
         <div class="col-lg-11">
-          <md-input type="text"
+          <md-input-container>
+            <input type="text"
                     name="message"
                     (keyup.enter)="sendMessage()"
                     placeholder="Send a Rumor"
-                    [formControl]="message"></md-input>
+                    [formControl]="message" />
+          </md-input-container>
         </div>
         <button class="col-lg-2" md-icon-button *ngIf="!rumorsResult.loading" (click)="rumorsResult.loadAll()">
           <icon name="fa-refresh" size="lg"></icon>

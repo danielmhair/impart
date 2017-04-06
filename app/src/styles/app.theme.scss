@@ -4,9 +4,9 @@
 // Define a theme.
 
 // Include non-theme styles for core.
-@include md-core();
+@include mat-core();
 
-$theme: md-light-theme($primary, $accent, $warn);
+$theme: mat-light-theme($primary, $accent, $warn);
 
 // Include all theme styles for the components.
 @include angular-material-theme($theme);

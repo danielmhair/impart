@@ -12,32 +12,32 @@ $font-family-serif:       Georgia, "Times New Roman", Times, serif !default;
 $font-family-monospace:   Menlo, Monaco, Consolas, "Courier New", monospace !default;
 $font-family-base:        $font-family-sans-serif !default;
 
-$brand-info:                md-color($accent) !default;
-$brand-primary:             md-color($primary) !default;
-$brand-warning:             md-color($warn) !default;
-$brand-success:             md-color($success) !default;
-$brand-danger:              md-color($danger) !default;
+$brand-info:                mat-color($accent) !default;
+$brand-primary:             mat-color($primary) !default;
+$brand-warning:             mat-color($warn) !default;
+$brand-success:             mat-color($success) !default;
+$brand-danger:              mat-color($danger) !default;
 
-$input-border-focus:        md-color($accent) !default;
+$input-border-focus:        mat-color($accent) !default;
 
-$state-success-text:        md-color($success, 900, 1) !default;
-$state-success-bg:          md-color($success, 100, 0.3) !default;
+$state-success-text:        mat-color($success, 900, 1) !default;
+$state-success-bg:          mat-color($success, 100, 0.3) !default;
 $state-success-border:      darken(adjust-hue($state-success-bg, -10), 5%) !default;
 
-$state-info-text:           md-color($accent, 900, 1) !default;
-$state-info-bg:             md-color($accent, 100, 0.3) !default;
+$state-info-text:           mat-color($accent, 900, 1) !default;
+$state-info-bg:             mat-color($accent, 100, 0.3) !default;
 $state-info-border:         darken(adjust-hue($state-info-bg, -10), 7%) !default;
 
-$state-warning-text:        md-color($warn, 900, 1) !default;
-$state-warning-bg:          md-color($warn, 100, 0.3) !default;
+$state-warning-text:        mat-color($warn, 900, 1) !default;
+$state-warning-bg:          mat-color($warn, 100, 0.3) !default;
 $state-warning-border:      darken(adjust-hue($state-warning-bg, -10), 5%) !default;
 
-$state-danger-text:         md-color($danger, 900, 1) !default;
-$state-danger-bg:           md-color($danger, 100, 0.3) !default;
+$state-danger-text:         mat-color($danger, 900, 1) !default;
+$state-danger-bg:           mat-color($danger, 100, 0.3) !default;
 $state-danger-border:       darken(adjust-hue($state-danger-bg, -10), 5%) !default;
 
-$code-color:                md-color($accent, 900, 1) !default;
-$code-bg:                   md-color($accent, 100, 0.3)  !default;
+$code-color:                mat-color($accent, 900, 1) !default;
+$code-bg:                   mat-color($accent, 100, 0.3)  !default;
 $icon-font-path:            "~bootstrap-sass/assets/fonts/bootstrap/";
 
 @import "~bootstrap-sass/assets/stylesheets/bootstrap";

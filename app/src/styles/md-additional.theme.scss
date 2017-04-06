@@ -8,13 +8,13 @@
   $background: map-get($theme, background);
   $foreground: map-get($theme, foreground);
 
-  $bg-primary: md-color($primary, 100, 0.3);
-  $bg-accent: md-color($accent, 100, 0.3);
-  $bg-warn: md-color($warn, 100, 0.3);
+  $bg-primary: mat-color($primary, 100, 0.3);
+  $bg-accent: mat-color($accent, 100, 0.3);
+  $bg-warn: mat-color($warn, 100, 0.3);
 
-  $text-primary: md-color($primary, 900, 1);
-  $text-accent: md-color($accent, 900, 1);
-  $text-warn: md-color($warn, 900, 1);
+  $text-primary: mat-color($primary, 900, 1);
+  $text-accent: mat-color($accent, 900, 1);
+  $text-warn: mat-color($warn, 900, 1);
 
   h1, h2, h3, h4, h5, h6, p, span, strong {
     &.md-accent {
