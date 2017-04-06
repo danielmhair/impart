@@ -3,10 +3,6 @@
 # compiled output
 /tmp
 
-flask_server/server/db_config.py
-flask_server/server/twitter_listener/errors.txt
-flask_server/server/twitter_listener/tweets.txt
-
 # dependencies
 /node_modules
 /bower_components

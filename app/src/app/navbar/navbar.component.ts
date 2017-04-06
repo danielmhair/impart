@@ -1,6 +1,5 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, ViewChild, Input} from '@angular/core';
 import {Link} from "../models/Link";
-import {Input} from "@angular/core/src/metadata/directives";
 
 @Component({
   selector: 'app-navbar',
