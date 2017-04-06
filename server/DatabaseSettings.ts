@@ -1,4 +1,4 @@
-const databaseName = "databaseName";
+const databaseName = "impart";
 const databaseType = "mongodb";
 
 export const DatabaseSettings = {

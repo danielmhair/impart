@@ -3,7 +3,7 @@ import * as https from 'https';
 
 import { Router } from 'express';
 import { ServerSettings } from '../../config/environment';
-import * as UserController from './user.controller';
+import { UserController } from './user.controller';
 import * as AuthService from '../../auth/auth.service';
 
 export const UserApi = Router();

@@ -3,7 +3,7 @@ import { Collection } from './collection.model';
 
 export class CollectionCtrl {
   // Get list of clients
-  public index(req, res) {
+  public static index(req, res) {
     Collection.find({}, function(err, documents) {
       if(err) { return CollectionCtrl.handleError(res, err); }
       return res.status(200).json(documents);
@@ -11,7 +11,7 @@ export class CollectionCtrl {
   }
 
   // Creates a new state in the DB.
-  public create(req, res) {
+  public static create(req, res) {
     if (req.body._id == null) delete req.body._id;
     Collection.create(req.body, function(err, collection) {
       if(err) { return CollectionCtrl.handleError(res, err); }
@@ -20,7 +20,7 @@ export class CollectionCtrl {
   }
 
   // Updates an existing state in the DB.
-  public update(req, res) {
+  public static update(req, res) {
     if(req.body._id) { delete req.body._id; }
     Collection.findById(req.params.id, function (err, document) {
       if (err) { return CollectionCtrl.handleError(res, err); }
@@ -34,7 +34,7 @@ export class CollectionCtrl {
   }
 
   // Deletes a state from the DB.
-  public destroy(req, res) {
+  public static destroy(req, res) {
     Collection.find({ _id: req.params.id }).remove(function(err) {
       if(err) { return CollectionCtrl.handleError(res, err); }
       return res.status(204).send('No Content');

@@ -1,0 +1,58 @@
+<form [formGroup]="rumorsForm">
+  <md-card>
+    <md-card-title>Rumors</md-card-title>
+  </md-card>
+  <md-card *ngIf="!rumorsResult.rumors && !rumorsResult.loading">
+    No Rumors
+  </md-card>
+  <md-card *ngIf="error" class="md-warn">
+    {{ error }}
+  </md-card>
+  <md-card class="padding-bottom-50">
+    <md-list class="list-group">
+      <md-list-item>
+        <div class="col-lg-4">
+          <md-input type="text"
+                    name="anonymousOriginator"
+                    placeholder="Your Name"
+                    [formControl]="anonymousOriginator"></md-input>
+        </div>
+        <div class="col-lg-4">
+          <md-input type="text"
+                    name="anonymousEndpoint"
+                    placeholder="Endpoint"
+                    [formControl]="anonymousEndpoint"></md-input>
+        </div>
+        <div class="col-lg-4">
+          <button md-icon-button
+                  [disabled]="!anonymousEndpointVal && !anonymousOriginatorVal"
+                  (click)="addAnonymousUser()"><md-icon>send</md-icon> Send Me Rumors!</button>
+        </div>
+      </md-list-item>
+    </md-list>
+  </md-card>
+  <md-card *ngIf="rumorsResult.rumors" class="padding-bottom-50">
+    <md-list class="list-group" *ngIf="rumorsResult.rumors">
+      <md-list-item>
+        <div class="col-lg-11">
+          <md-input type="text"
+                    name="message"
+                    (keyup.enter)="sendMessage()"
+                    placeholder="Send a Rumor"
+                    [formControl]="message"></md-input>
+        </div>
+        <button class="col-lg-2" md-icon-button *ngIf="!rumorsResult.loading" (click)="rumorsResult.loadAll()">
+          <icon name="fa-refresh" size="lg"></icon>
+        </button>
+      </md-list-item>
+      <md-list-item *ngFor="let rumor of rumorsResult.rumors; let i = index;"
+                    class="list-group-item row no-padding margin-left-5 margin-right-5">
+        <!--<div class="col-lg-5">{{ rumor.EndPoint }}</div>-->
+        <div class="col-lg-4">{{ rumor.Rumor.messageID }}</div>
+        <div class="col-lg-2">{{ rumor.Rumor.Originator }}</div>
+        <div class="col-lg-6">{{ rumor.Rumor.Text }}</div>
+      </md-list-item>
+    </md-list>
+  </md-card>
+  <md-progress-bar mode="indeterminate" *ngIf="rumorsResult.loading"></md-progress-bar>
+</form>

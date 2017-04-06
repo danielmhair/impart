@@ -50,7 +50,7 @@ export class Server {
    * @class Server
    * @constructor
    */
-  constructor(httpPort: number, httpsPort) {
+  constructor(httpPort?: number, httpsPort?: number) {
     this.httpPort = httpPort;
     this.httpsPort = httpsPort;
 
@@ -59,9 +59,6 @@ export class Server {
 
     // Set environment to development as default
     process.env.NODE_ENV = process.env.NODE_ENV || 'development';
-
-    // Whenever a file is not known, assume it can be read as text/html
-    express.static.mime.default_type = "text/html";
 
     // Security for Express
     this.app.use(helmet());
@@ -95,27 +92,31 @@ export class Server {
       // if(ServerSettings.seedDB) { require('./config/seed'); }
     }
 
-    http.createServer(this.app).listen(httpPort, err => {
-      if (err) {
-        logger.error(err);
-        return;
-      }
-      logger.info(`Listening on port ${httpPort}`);
-    });
-
     const options = {
       host: ServerSettings.ip,
       key: fs.readFileSync('ssl/server.key'),
       cert: fs.readFileSync('ssl/server.crt')
     };
 
-    https.createServer(options, this.app).listen(httpsPort, err => {
-      if (err) {
-        logger.error(err);
-        return;
-      }
-      logger.info(`Listening on port ${httpsPort}`);
-    });
+    if (this.httpPort) {
+      http.createServer(this.app).listen(httpPort, err => {
+        if (err) {
+          logger.error(err);
+          return;
+        }
+        logger.info(`Listening on port ${httpPort}`);
+      });
+    }
+
+    if (this.httpsPort) {
+      https.createServer(options, this.app).listen(httpsPort, err => {
+        if (err) {
+          logger.error(err);
+          return;
+        }
+        logger.info(`Listening on port ${httpsPort}`);
+      });
+    }
   }
 
   public initPassport(): void {
@@ -140,30 +141,8 @@ export class Server {
   public initRoutes(): void {
     // this.app.use('/app', express.static(path.join(__dirname, '../dist')));
     this.app.get('/healthcheck', (req, res) => { res.json({}) });
-
-    this.app.set("view options", {layout: false});
-    this.app.engine('html', ejs.renderFile);
-    this.app.set('view engine', 'html');
-    // this.app.use('/CS201R', express.static('../apps'));
-    this.app.use('/prev', express.static('../apps/views'));
-    this.app.use('/rewardme', express.static('../apps/uRewardMe/build'));
-    this.app.use(express.static('../apps/home'));
-
-    const env = this.app.get('env');
-    // if (env === 'production') {
-    this.app.use(favicon(path.join(ServerSettings.root, 'apps', 'home', 'favicon.ico')));
-    // }
-
-    // if (env === 'development' || env === 'test') {
-    //   this.app.use(connectLiveReload());
-    //   this.app.use(express.static(path.join(ServerSettings.root, '.tmp')));
-    //   this.app.use(errorHandler()); // Error handler - has to be last
-    // }
-
-
     this.app.use('/api/users', UserApi);
     this.app.use('/auth', AuthApi);
-
     this.app.route('/:url(node_modules|assets|server|src)/*')
     .get(Server.PageNotFound404);
   }
@@ -173,4 +152,4 @@ export class Server {
   }
 }
 
-exports = new Server(80, 443).app;
+exports = new Server(null, 3008).app;

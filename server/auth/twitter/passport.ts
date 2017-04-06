@@ -2,7 +2,7 @@ import * as passport from 'passport';
 import * as uuid from 'node-uuid';
 import { Utils } from '../../utils';
 import { Strategy } from 'passport-twitter';
-import * as UserController from  '../../api/user/user.controller';
+import { UserController } from  '../../api/user/user.controller';
 import { ServerSettings } from '../../config/environment';
 
 class TwitterPassportSetup {

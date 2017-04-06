@@ -3,13 +3,10 @@ import { Router } from 'express';
 import { CollectionCtrl } from './collection.controller';
 import * as jwtCheck from '../jwtCheck';
 
-const router = Router();
-const controller = new CollectionCtrl();
+export const CollectionApi = Router();
 
-router.get('/', jwtCheck, controller.index);
-router.post('/', jwtCheck, controller.create);
-router.put('/:id', jwtCheck, controller.update);
-router.patch('/:id', jwtCheck, controller.update);
-router.delete('/:id', jwtCheck, controller.destroy);
-
-exports = router;
+CollectionApi.get('/', /*jwtCheck, */CollectionCtrl.index);
+CollectionApi.post('/', /*jwtCheck, */CollectionCtrl.create);
+CollectionApi.put('/:id', /*jwtCheck, */CollectionCtrl.update);
+CollectionApi.patch('/:id', /*jwtCheck, */CollectionCtrl.update);
+CollectionApi.delete('/:id', /*jwtCheck, */CollectionCtrl.destroy);

@@ -2,7 +2,7 @@
 
 import * as express from 'express';
 import * as passport from 'passport';
-import * as AuthService from '../auth.service';
+import { AuthService } from '../auth.service';
 
 export const LocalApi = express.Router();
 
