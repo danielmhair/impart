@@ -11,9 +11,7 @@ export class User {
   facebook: any;
   nodeEndpoint: string;
   uuid: string;
-  neighbors: string[];
-  rumors: any[];
-  seed: boolean;
+  categories: string[];
 
   constructor(username: string, first_name?: string, last_name?: string, role?: string, google_id?: string, id?: string) {
     this._id = id ? id : null;
@@ -22,5 +20,6 @@ export class User {
     this.first_name = first_name ? first_name : null;
     this.last_name = last_name ? last_name : null;
     this.role = role ? role : 'user';
+    this.categories = [];
   }
 }

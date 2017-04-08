@@ -150,16 +150,18 @@ export abstract class ApiStream<T extends ApiModel> extends BehaviorSubject<T[]>
       .map(res => res.json())
       .subscribe(
         (items: T[]) => { // on success
-          console.log("Rumors receieved");
+          console.log("Activities receieved");
           console.log(items);
           super.next([]);
           items.forEach(item => {
             this.createStream.next(item);
           });
+          resolve(items)
         },
         (err: any) => {
           console.log(err);
           super.error(err);
+          reject(err)
         }
       );
     })

@@ -5,20 +5,45 @@
   <md-card *ngIf="userActivityStream.errMessage" class="mat-warn">
     {{ userActivityStream.errMessage }}
   </md-card>
-  <md-card *ngIf="" class="padding-bottom-50">
-    <md-list class="list-group">
-      <md-list-item>
-        <div class="col-lg-11">
-          <md-input-container>
-            <input mdInput type="text"
-                    name="message"
-                    (keyup.enter)="sendMessage()"
-                    placeholder="Send a Rumor"
-                    [formControl]="message" />
-          </md-input-container>
-        </div>
-      </md-list-item>
-    </md-list>
-  </md-card>
-  <md-progress-bar mode="indeterminate" *ngIf="userActivityStream.loading"></md-progress-bar>
+  
+  <div *ngIf="user && user.categories">
+    <md-card>Categories</md-card>
+    <md-card>
+      <md-input-container>
+        <input mdInput type="text"
+               name="newCategory"
+               (keyup.enter)="addCategory()"
+               placeholder="Add a category"
+               [formControl]="newCategory" />
+      </md-input-container>
+      {{ newCategory.valueChanges | async }}
+    </md-card>
+    <md-card *ngFor="let category of user.categories" class="margin-bottom-10">
+      {{ category }}
+    </md-card>
+  </div>
+  <!-- Move to another component for activities-->
+  <!--<md-card>Activities</md-card>-->
+  <!--<md-card *ngIf="userActivityStream | async as activities; else loading" class="padding-bottom-50">-->
+    <!--<md-list class="list-group">-->
+      <!--<md-list-item>-->
+        <!--<md-input-container>-->
+          <!--<input mdInput type="text"-->
+                  <!--name="message"-->
+                  <!--(keyup.enter)="sendMessage()"-->
+                  <!--placeholder="Add an activity"-->
+                  <!--[formControl]="message" />-->
+        <!--</md-input-container>-->
+      <!--</md-list-item>-->
+      <!--<md-list-item *ngFor="let activity of activity">-->
+        <!--{{ activity.name }}-->
+      <!--</md-list-item>-->
+    <!--</md-list>-->
+  <!--</md-card>-->
+  <!--<ng-template #loading>-->
+    <!--<md-card class="mat-accent">-->
+      <!--Loading...-->
+    <!--</md-card>-->
+  <!--</ng-template>-->
+  <!--<md-progress-bar mode="indeterminate" *ngIf="userActivityStream.loading"></md-progress-bar>-->
 </form>

@@ -29,24 +29,28 @@ export class UserService {
   public getUser() {
     this.loading = true;
     let username = this.getCurrentUsername();
-    if (!username) {
-      console.log('Has username?', username);
-      this.userStream.error('User is not authenticated');
-      return;
-    }
-    this.http.get(`${Constants.USER_API}/${username}`)
-    .map(res => res.json())
-    .subscribe(
-      (user: User) => {
-        this.loading = false;
-        console.log(user);
-        this.userStream.next(user);
-      },
-      err => {
-        this.loading = false;
-        this.userStream.error(err)
+    return new Promise((resolve, reject) => {
+      if (!username) {
+        console.log('Has username?', username);
+        this.userStream.error('User is not authenticated');
+        return reject("User is not authenticated.")
       }
-    );
+      this.http.get(`${Constants.USER_API}/${username}`)
+      .map(res => res.json())
+      .subscribe(
+        (user: User) => {
+          this.loading = false;
+          console.log(user);
+          this.userStream.next(user);
+          resolve(user)
+        },
+        err => {
+          this.loading = false;
+          this.userStream.error(err)
+          reject(err)
+        }
+      );
+    })
   }
 
   public isAuthenticated() {
