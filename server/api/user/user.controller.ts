@@ -190,57 +190,6 @@ export class UserController {
     })
   }
 
-  public static checkins(req, res) {
-    let token = req.query.token;
-    let username = req.query.username;
-    if (!token) {
-      return res.json({error: "No token found"});
-    }
-    let options = {
-      hostname: 'api.foursquare.com',
-      path: '/v2/users/self/checkins',
-      method: 'GET',
-      oauth_token: token
-    };
-    let URI = 'https://api.foursquare.com/v2/users/self/checkins';
-    let query = "?oauth_token=" + token + '&v=20170214';
-    let completeURI = URI + query;
-    UserController.getCheckins(completeURI, req.param("id")).then((data) => {
-      console.log(data);
-      res.status(200).json(data)
-    }).catch((err) => {
-      return res.status(500).json({error: err})
-    })
-  };
-
-  public static getCheckins(url, id) {
-  console.log(url);
-  return Q.Promise((resolve, reject) => {
-    let body: any = '';
-    let json: any = '';
-    https.get(url, (resp) => {
-      resp.on("data", (chunk) => {
-        body += chunk;
-      });
-      resp.on('end', () => {
-        json = JSON.parse(body);
-        let checkins = json.response.checkins;
-        console.log(json);
-        console.log(checkins);
-        UserModel.findById(id, (err, user) => {
-          if (err) return reject({status: 500, error: err});
-          user.checkins = checkins;
-          resolve({user: user, checkins: checkins, json: json});
-        })
-      });
-
-      resp.on("error", (err) => {
-        reject({status: 500, message: err})
-      })
-    })
-  });
-}
-
   public static addNeighborAndSave(newUser) {
     console.log("Adding neighbor and saving");
     return Q.Promise((resolve, reject) => {

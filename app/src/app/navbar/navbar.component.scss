@@ -18,6 +18,13 @@
       &.brand-icon {
         float: left;
         margin-right: 15px;
+
+        /deep/ .svg-icon {
+          height: 45px;
+          width: 45px;
+          top: -10px;
+          position: relative;
+        }
       }
     }
 

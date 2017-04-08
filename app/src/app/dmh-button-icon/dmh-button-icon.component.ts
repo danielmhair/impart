@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
   selector: 'dmh-button-icon',
@@ -8,8 +8,9 @@ import { Component, Input } from '@angular/core';
 export class DmhButtonIconComponent {
   @Input() name: string;
   @Input() size: string;
+  @Input() iconOnly: boolean;
 
-  constructor() { }
+  constructor() {}
 
   contains(sub: string) {
     return this.name.indexOf(sub) >= 0;

@@ -1,6 +1,9 @@
-<button md-icon-button class="dmh-button-icon dmh-button-{{size}}"
-        type="button"
-        color="primary">
+<button md-button class="dmh-button dmh-button-{{size}}" *ngIf="!iconOnly" type="button">
+  <md-icon *ngIf="contains('ti')" class="icon icon-{{size}} {{name}}"></md-icon>
+  <md-icon *ngIf="contains('fa')" class="icon icon-{{size}} fa {{name}}"></md-icon>
+  <ng-content></ng-content>
+</button>
+<button md-icon-button class="dmh-button-icon dmh-button-{{size}}" *ngIf="iconOnly" type="button">
   <md-icon *ngIf="contains('ti')" class="icon icon-{{size}} {{name}}"></md-icon>
   <md-icon *ngIf="contains('fa')" class="icon icon-{{size}} fa {{name}}"></md-icon>
 </button>

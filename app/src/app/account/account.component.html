@@ -1,0 +1,24 @@
+<form [formGroup]="accountForm">
+  <md-card *ngIf="user">
+    <md-card-title>Welcome, {{ user.name }}!</md-card-title>
+  </md-card>
+  <md-card *ngIf="userActivityStream.errMessage" class="mat-warn">
+    {{ userActivityStream.errMessage }}
+  </md-card>
+  <md-card *ngIf="" class="padding-bottom-50">
+    <md-list class="list-group">
+      <md-list-item>
+        <div class="col-lg-11">
+          <md-input-container>
+            <input mdInput type="text"
+                    name="message"
+                    (keyup.enter)="sendMessage()"
+                    placeholder="Send a Rumor"
+                    [formControl]="message" />
+          </md-input-container>
+        </div>
+      </md-list-item>
+    </md-list>
+  </md-card>
+  <md-progress-bar mode="indeterminate" *ngIf="userActivityStream.loading"></md-progress-bar>
+</form>

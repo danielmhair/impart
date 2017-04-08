@@ -20,11 +20,12 @@ class GooglePassportSetup {
           ]
         }, function(err, user) {
           if (!user) {
+            console.log(profile);
             user = new User({
               name: profile.displayName,
               email: profile.emails[0].value,
               role: 'user',
-              username: profile.username,
+              username: profile.emails[0].value.split("@")[0],
               provider: 'google',
               google: profile._json
             });

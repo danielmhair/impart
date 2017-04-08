@@ -41,7 +41,7 @@ export class AuthService {
     if (!roleRequired) throw new Error('Required role needs to be set');
 
     return compose()
-    .use(this.isAuthenticated())
+    .use(AuthService.isAuthenticated())
     .use((req, res, next) => {
       if (ServerSettings.userRoles.indexOf(req.user.role) >= ServerSettings.userRoles.indexOf(roleRequired)) {
         next();
@@ -66,9 +66,9 @@ export class AuthService {
     if (!req.user) return res.status(404).json({ message: 'Something went wrong, please try again.'});
     console.log(req.user);
 
-    let token = this.signToken(req.user._id);
+    let token = AuthService.signToken(req.user._id);
     res.cookie('token', token);
-    const expiration = this.dateAdd(Date.now(), "minute", ServerSettings.tokenAgeInMinutes).getTime() / 1000;
+    const expiration = AuthService.dateAdd(Date.now(), "minute", ServerSettings.tokenAgeInMinutes).getTime() / 1000;
     console.log(expiration);
     const params = [
       'token=' + token,

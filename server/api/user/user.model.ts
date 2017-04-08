@@ -27,7 +27,6 @@ export interface IUser extends Document {
   nodeEndpoint: string;
   neighbors: string[];
   uuid: String;
-  checkins: Object;
   permissions: string[];
   hashedPassword: string;
   provider: string;
@@ -50,6 +49,26 @@ let UserSchema: Schema = new Schema({
     default: 'user'
   },
   seed: { type: Boolean, default: false },
+  nodeEndpoint: String,
+  uuid: String,
+  hashedPassword: String,
+  provider: String,
+  salt: String,
+  facebook: {},
+  twitter: {},
+  google: {},
+  github: {},
+  foursquare: {},
+  categories: [],
+
+  // TODO Both the the arrays below can be put into one other collection (userId:followerId)
+  // To get people following you, search by { userId: userId }
+  // To get people your following, search by { followerId: userId }
+  // TODO Make activities a mongo document (we don't want an array for each user)
+  activities: [],
+  // TODO Remove properties below...
+  neighbors: [String],
+  permissions: [],
   rumors: [{
     Rumor: {
       messageID: String,
@@ -58,19 +77,6 @@ let UserSchema: Schema = new Schema({
     },
     EndPoint: String
   }],
-  nodeEndpoint: String,
-  neighbors: [String],
-  uuid: String,
-  checkins: {},
-  permissions: [],
-  hashedPassword: String,
-  provider: String,
-  salt: String,
-  facebook: {},
-  twitter: {},
-  google: {},
-  github: {},
-  foursquare: {}
 });
 
 

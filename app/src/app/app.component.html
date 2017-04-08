@@ -1,3 +1,5 @@
-<app-navbar [brand]="brand" [leftLinks]="leftLinks" [rightLinks]="rightLinks">
-  <router-outlet></router-outlet>
+<app-navbar [brand]="brand" [topLinks]="topLinks" [bottomHeading]="bottomHeading" [bottomLinks]="bottomLinks">
+  <div class="container">
+    <router-outlet></router-outlet>
+  </div>
 </app-navbar>

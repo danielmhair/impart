@@ -10,7 +10,6 @@ export class UserService {
   public user: User;
   public loading: boolean = false;
   public userStream: BehaviorSubject<User> = new BehaviorSubject(null);
-  public usersStream: BehaviorSubject<User[]> = new BehaviorSubject(null);
 
   constructor(private http: Http, private router: Router) {
     this.userStream
@@ -42,54 +41,12 @@ export class UserService {
         this.loading = false;
         console.log(user);
         this.userStream.next(user);
-        if (user.foursquare) {
-          console.log(user.foursquare.token);
-          this.getCheckins(user._id, user.foursquare.token);
-        }
-        this.getAll();
       },
       err => {
         this.loading = false;
         this.userStream.error(err)
       }
     );
-  }
-
-  public getAll() {
-    this.http.get(`${Constants.USER_API}`)
-    .map(res => res.json())
-    .subscribe(
-      users => this.usersStream.next(users),
-      err => this.usersStream.error(err)
-    )
-  }
-
-  public getCheckins(id: string, token: string) {
-    this.http.get(`${Constants.USER_API}/${id}/account?token=${token}`)
-    .map(res => res.json())
-    .subscribe(
-      response => {
-        this.userStream.next(response.user);
-        console.log(response)
-      },
-      err => {
-        console.error(err)
-      }
-    )
-  }
-
-  public createAnonymousUser(originator: string, endpoint: string) {
-    return new Observable(observer => {
-      this.http.post(Constants.USER_API, {
-        originator: originator,
-        endpoint: endpoint
-      })
-      .map(res => res.json())
-      .subscribe(
-        (user: User) => observer.next(user),
-        err => observer.error(err)
-      );
-    })
   }
 
   public isAuthenticated() {
@@ -145,24 +102,6 @@ export class UserService {
 
   public isAdmin() {
     return this.user && this.user.role == 'admin'
-  }
-
-  private extractToken(res: Response) {
-    console.log("Extracting token...");
-    let jsonResp = res.json();
-    if (res.status === 200) {
-      let token = jsonResp.token;
-      console.log(token);
-      let tokenAge = jsonResp.expires_in;
-      console.log(tokenAge);
-      const expirationTime = Math.floor(new Date().getTime() / 1000) + Number(tokenAge);
-      localStorage.setItem('token', token);
-      localStorage.setItem('token_age', String(expirationTime));
-    }
-  }
-
-  private handleError(error: any) {
-    return Observable.throw(error);
   }
 
   /**

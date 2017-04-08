@@ -9,8 +9,10 @@ import {Link} from "../models/Link";
 export class NavbarComponent {
   @ViewChild('menuRight') menu: any;
   @Input() brand: Link;
-  @Input() leftLinks: Link[];
-  @Input() rightLinks: Link[];
+  @Input() topHeading: string;
+  @Input() topLinks: Link[];
+  @Input() bottomHeading: string;
+  @Input() bottomLinks: Link[];
 
   constructor() {}
 

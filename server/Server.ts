@@ -17,11 +17,9 @@ import { connection } from 'mongoose';
 import * as compression from 'compression';
 import * as methodOverride from 'method-override';
 import * as cookieParser from 'cookie-parser';
-import * as errorHandler from 'errorhandler';
 import * as passport from 'passport';
 import * as session from 'express-session';
 import * as connectMongo from 'connect-mongo'
-import * as connectLiveReload from 'connect-livereload';
 import * as favicon from 'serve-favicon';
 
 const mongoStore = connectMongo(session);
@@ -32,6 +30,7 @@ import { MongoManager } from './MongoManager';
 import { ServerSettings } from './config/environment';
 import { UserApi } from './api/user';
 import { AuthApi } from './auth';
+import { UserActivityApi } from './api/user-activity';
 
 /**
  * The server for Node
@@ -146,10 +145,11 @@ export class Server {
     this.app.use(express.static('../app/build'));
 
     const env = this.app.get('env');
-    this.app.use(favicon(path.join(ServerSettings.root, 'apps', 'home', 'favicon.ico')));
+    this.app.use(favicon(path.join(ServerSettings.root, 'app', 'src', 'favicon.ico')));
 
     this.app.use('/api/users', UserApi);
     this.app.use('/auth', AuthApi);
+    this.app.use('/api/user_activities', UserActivityApi);
 
     this.app.route('/:url(node_modules|assets|server|src)/*')
     .get(Server.PageNotFound404);
@@ -160,4 +160,4 @@ export class Server {
   }
 }
 
-exports = new Server(null, 3008).app;
+exports = new Server(3008, null).app;

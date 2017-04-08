@@ -5,7 +5,7 @@
   "main": "lib/Server",
   "typings": "lib/Server",
   "scripts": {
-    "build:live": "nodemon --exec ./node_modules/.bin/ts-node -- ./Server.ts",
+    "build:live": "nodemon --exec ts-node -- ./Server.ts",
     "start": "npm run build:live"
   },
   "author": "",
@@ -50,6 +50,7 @@
     "passport-foursquare": "^1.0.0",
     "passport-google": "^0.3.0",
     "passport-google-oauth": "^1.0.0",
+    "passport-local": "^1.0.0",
     "passport-oauth2": "^1.4.0",
     "passport-twitter": "^1.0.4",
     "q": "^1.4.1",
