@@ -160,4 +160,4 @@ export class Server {
   }
 }
 
-exports = new Server(3008, null).app;
+exports = new Server(null, 3008).app;

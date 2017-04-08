@@ -9,6 +9,7 @@ import * as request from 'request';
 import * as uuid from 'node-uuid';
 import * as Q from 'q'
 import { Utils } from '../../utils';
+import {HttpRequest} from "../http-request";
 
 export class UserController {
   /**
@@ -16,11 +17,11 @@ export class UserController {
    * restriction: 'admin'
    */
   public static index(req, res) {
-  UserModel.find({}, '-salt -hashedPassword', (err, users: IUser[]) => {
-    if (err) return res.status(500).send(err);
-    res.status(200).json(users);
-  });
-};
+    UserModel.find({}, '-salt -hashedPassword', (err, users: IUser[]) => {
+      if (err) return res.status(500).send(err);
+      res.status(200).json(users);
+    });
+  };
 
   public static getRumors(req, res) {
     UserModel.findById(req.params.id, (err, user: IUser) => {
@@ -87,30 +88,30 @@ export class UserController {
   };
 
   public static createRumorFromMessage(userId, message) {
-  return Q.Promise((resolve, reject) => {
-    UserModel.findById(userId, (err, user) => {
-      if (err) return reject({status: 500, message: err});
-      if (!user) return reject({status: 404, message: "Unable to get user"});
-      let text = message;
-      let originator = user.username;
-      let maxSequenceNum = UserController.maxSequenceNumber(user.rumors, user.uuid);
-      let messageId = user.uuid + ":" + (maxSequenceNum + 1);
-      let rumor = {
-        Rumor: {
-          messageID: messageId,
-          Originator: originator,
-          Text: text
-        },
-        EndPoint: user.nodeEndpoint
-      };
-      user.rumors.push(rumor);
-      user.save((err) => {
+    return Q.Promise((resolve, reject) => {
+      UserModel.findById(userId, (err, user) => {
         if (err) return reject({status: 500, message: err});
-        return resolve(rumor)
+        if (!user) return reject({status: 404, message: "Unable to get user"});
+        let text = message;
+        let originator = user.username;
+        let maxSequenceNum = UserController.maxSequenceNumber(user.rumors, user.uuid);
+        let messageId = user.uuid + ":" + (maxSequenceNum + 1);
+        let rumor = {
+          Rumor: {
+            messageID: messageId,
+            Originator: originator,
+            Text: text
+          },
+          EndPoint: user.nodeEndpoint
+        };
+        user.rumors.push(rumor);
+        user.save((err) => {
+          if (err) return reject({status: 500, message: err});
+          return resolve(rumor)
+        });
       });
-    });
-  })
-};
+    })
+  };
 
   public static resolveRumor(userId, rumor) {
     return Q.Promise((resolve, reject) => {
@@ -537,22 +538,7 @@ export class UserController {
 
 
   public static httpPost(url, body) {
-    return Q.Promise((resolve, reject) => {
-      if (!url) return reject("No url");
-      console.log(url)
-      request({
-        url: url,
-        method: "POST",
-        body: JSON.stringify(body),
-        headers: {
-          "Content-Type": "application/json"
-        },
-        rejectUnauthorized: false
-      }, (error, response, body) => {
-        if (error) return reject(error);
-        return resolve({status: response.status, data: body})
-      });
-    })
+    return HttpRequest.post(url, body);
   }
 
   public static validationError(res, err) {

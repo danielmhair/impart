@@ -37,6 +37,10 @@ export class ServerSettings {
       }
     }
   };
+
+  public static eventful = {
+    applicationKey: '5JbTdSGnZvzCnWZk'
+  }
   
   public static facebook = {
     clientID:     '470257669848563',
