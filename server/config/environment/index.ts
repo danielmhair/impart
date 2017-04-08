@@ -2,8 +2,8 @@
 
 import * as path from 'path';
 
-// const domain = "https://www.danielmhair.com:3008";
-const domain = "http://localhost:3008";
+const domain = "https://www.danielmhair.com:3008";
+// const domain = "http://localhost:3008";
 export class ServerSettings {
   // Server port
   public static httpsPort: 3008;
