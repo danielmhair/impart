@@ -9,4 +9,5 @@ export class Constants {
   public static FACEBOOK_LOGIN: string = `${Constants.AUTH_API}/facebook`;
   public static TWITTER_LOGIN: string = `${Constants.AUTH_API}/twitter`;
   public static FOURSQUARE_LOGIN: string = `${Constants.AUTH_API}/foursquare`;
+  public static EVENTFUL_APP_KEY: string = "5JbTdSGnZvzCnWZk"
 }

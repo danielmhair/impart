@@ -1,15 +1,14 @@
 'use strict';
 
-import { IUser, UserModel } from './user.model';
-import * as passport from 'passport';
+import { IUser, User } from './user.model';
 import { ServerSettings } from '../../config/environment';
 import * as jwt from 'jsonwebtoken';
-import * as https from 'https';
-import * as request from 'request';
 import * as uuid from 'node-uuid';
 import * as Q from 'q'
 import { Utils } from '../../utils';
 import {HttpRequest} from "../http-request";
+// import { Suggestion } from "../../models/Suggestion"
+// import { Want } from "../../models/Want"
 
 export class UserController {
   /**
@@ -17,14 +16,14 @@ export class UserController {
    * restriction: 'admin'
    */
   public static index(req, res) {
-    UserModel.find({}, '-salt -hashedPassword', (err, users: IUser[]) => {
+    User.find({}, '-salt -hashedPassword', (err, users: IUser[]) => {
       if (err) return res.status(500).send(err);
       res.status(200).json(users);
     });
   };
 
   public static getRumors(req, res) {
-    UserModel.findById(req.params.id, (err, user: IUser) => {
+    User.findById(req.params.id, (err, user: IUser) => {
       if (err) return res.status(500).send(err);
       if (!user) return res.status(404).send("Unable to get user");
       return res.status(200).json(user.rumors)
@@ -33,10 +32,10 @@ export class UserController {
 
   public static resolveWant(userId, want) {
     return Q.Promise((resolve, reject) => {
-      UserModel.findById(userId, (err, userWithWant: IUser) => {
+      User.findById(userId, (err, userWithWant: IUser) => {
         if (err) return reject({status: 500, message: err});
         if (!userWithWant) return reject({status: 404, message: "Unable to get user"});
-        UserModel.find({nodeEndpoint: want.EndPoint}, (err, userWithRumor: IUser) => {
+        User.find({nodeEndpoint: want.EndPoint}, (err, userWithRumor: IUser) => {
           if (err) return reject(err)
           if (!userWithRumor) return reject({status: 200, data: "User is not found"})
           if (!userWithRumor.rumors) userWithRumor.rumors = []
@@ -64,7 +63,7 @@ export class UserController {
       console.log(userId);
       console.log(rumor);
       console.log(rumor.Rumor.Text)
-      UserModel.findById(userId, (err, user) => {
+      User.findById(userId, (err, user) => {
         if (err) {
           console.error(err)
           return reject({status: 500, message: err});
@@ -89,9 +88,11 @@ export class UserController {
 
   public static createRumorFromMessage(userId, message) {
     return Q.Promise((resolve, reject) => {
-      UserModel.findById(userId, (err, user) => {
+      User.findById(userId, (err, user) => {
         if (err) return reject({status: 500, message: err});
         if (!user) return reject({status: 404, message: "Unable to get user"});
+        // const suggest = new Suggestion("user", {}, "string");
+        // const want = new Want(...);
         let text = message;
         let originator = user.username;
         let maxSequenceNum = UserController.maxSequenceNumber(user.rumors, user.uuid);
@@ -118,14 +119,14 @@ export class UserController {
       let resultPromise = null;
       console.log("Resolving rumor")
       console.log(rumor.EndPoint)
-      UserModel.findOne({nodeEndpoint: rumor.EndPoint}, (err, user) => {
+      User.findOne({nodeEndpoint: rumor.EndPoint}, (err, user) => {
         if (err) {
           console.log(err)
           return reject({status: 500, message: err});
         }
         if (!user) {
           console.log("There is no user, creating new User...")
-          let newUser = new UserModel({
+          let newUser = new User({
             name: rumor.Rumor.Originator,
             username: rumor.Rumor.Originator,
             seed: true,
@@ -196,9 +197,9 @@ export class UserController {
     return Q.Promise((resolve, reject) => {
       if (newUser.seed) {
         // Put all the other seeds as its neighbors and give me to them as a neighbor
-        UserModel.find({seed: true}, (err, users) => {
+        User.find({seed: true}, (err, users) => {
           if (err) {
-            console.error(err)
+            console.error(err);
             return reject({status: 500, message: err});
           }
           if (!users) return reject({status: 404, err: "Unable to get users."});
@@ -230,7 +231,7 @@ export class UserController {
         })
       } else {
         console.log("Not a seed");
-        UserModel.find({seed: true}, (err, users) => {
+        User.find({seed: true}, (err, users) => {
           if (err) return reject({status: 500, err: err});
           if (!users) return reject({status: 404, err: "Unable to get users."})
 
@@ -282,7 +283,7 @@ export class UserController {
     return Q.Promise((resolve, reject) => {
       let newUser = null;
       if (originator && endpoint) {
-        newUser = new UserModel({
+        newUser = new User({
           nodeEndpoint: endpoint,
           username: originator,
           name: originator,
@@ -292,7 +293,7 @@ export class UserController {
       }
       newUser.uuid = uuid.v4();
       newUser.seed = Utils.getRandom(0, 5) % 3 === 0;
-      UserModel.find({username: originator, provider: "anonymous"}, (err, users) => {
+      User.find({username: originator, provider: "anonymous"}, (err, users) => {
         if (!err && users && users.length > 0) {
           console.log("Found node endpoint with username. Don't need to add user.")
           console.log(users)
@@ -323,15 +324,14 @@ export class UserController {
     let endpoint = req.body.endpoint;
     let newUser = null;
     if (originator && endpoint) {
-      newUser = new UserModel({
+      newUser = new User({
         nodeEndpoint: endpoint,
         username: originator,
         name: originator,
         role: 'user',
-        provider: 'anonymous'
       });
     } else {
-      newUser = new UserModel(req.body);
+      newUser = new User(req.body);
       newUser.nodeEndpoint = "https://www.danielmhair.com/api/users/" + newUser._id + "/rumors";
       newUser.role = 'user';
       newUser.provider = 'local';
@@ -339,7 +339,7 @@ export class UserController {
     newUser.uuid = uuid.v4();
     newUser.seed = Utils.getRandom(0, 5) % 3 === 0;
     if (newUser.provider === "anonymous") {
-      UserModel.find({username: originator, provider: "anonymous"}, (err, users) => {
+      User.find({username: originator, provider: "anonymous"}, (err, users) => {
         if (!err && users && users.length > 0) {
           console.log("Found node endpoint with username. Don't need to add user.")
           console.log(users)
@@ -380,7 +380,7 @@ export class UserController {
   public static show = (req, res, next) => {
     let username = req.params.username;
 
-    UserModel.findOne({username: username}, (err, user) => {
+    User.findOne({username: username}, (err, user) => {
       if (err) return next(err);
       if (!user) return res.status(401).send('Unauthorized');
       res.status(200).json(user);
@@ -392,7 +392,7 @@ export class UserController {
    * restriction: 'admin'
    */
   public static destroy(req, res) {
-    UserModel.findByIdAndRemove(req.params.id, (err, user) => {
+    User.findByIdAndRemove(req.params.id, (err, user) => {
       if (err) return res.status(500).send(err);
       return res.status(204).send('No Content');
     });
@@ -406,7 +406,7 @@ export class UserController {
     let oldPass = String(req.body.oldPassword);
     let newPass = String(req.body.newPassword);
 
-    UserModel.findById(userId, (err, user) => {
+    User.findById(userId, (err, user) => {
       if (user.authenticate(oldPass)) {
         user.password = newPass;
         user.save((err) => {
@@ -424,7 +424,7 @@ export class UserController {
    */
   public static me(req, res, next) {
     let userId = req.user._id;
-    UserModel.findOne({
+    User.findOne({
       _id: userId
     }, '-salt -hashedPassword', (err, user) => { // don't ever give out the password or salt
       if (err) return next(err);
@@ -441,7 +441,7 @@ export class UserController {
   };
 
   public static propagateRumors = () => {
-    UserModel.find({}, (err, users) => {
+    User.find({}, (err, users) => {
       console.log(users)
       users.forEach((user) => {
         console.log("============")

@@ -30,7 +30,10 @@ import { MongoManager } from './MongoManager';
 import { ServerSettings } from './config/environment';
 import { UserApi } from './api/user';
 import { AuthApi } from './auth';
-import { UserActivityApi } from './api/user-activity';
+import { ActivityApi } from './api/activity';
+import { ActivityUserApi } from './api/activity-user';
+import { UserFollowerApi } from './api/user-follower'
+import { EventfulApi } from './api/eventful';
 
 /**
  * The server for Node
@@ -149,7 +152,10 @@ export class Server {
 
     this.app.use('/api/users', UserApi);
     this.app.use('/auth', AuthApi);
-    this.app.use('/api/user_activities', UserActivityApi);
+    this.app.use('/api/activities', ActivityApi);
+    this.app.use('/api/activities-users', ActivityUserApi);
+    this.app.use('/api/users-followers', UserFollowerApi);
+    this.app.use('/api/eventful', EventfulApi);
 
     this.app.route('/:url(node_modules|assets|server|src)/*')
     .get(Server.PageNotFound404);

@@ -14,9 +14,16 @@
                name="newCategory"
                (keyup.enter)="addCategory()"
                placeholder="Add a category"
-               [formControl]="newCategory" />
+               [formControl]="newCategory"
+               [mdAutocomplete]="auto" />
       </md-input-container>
-      {{ newCategory.valueChanges | async }}
+  
+      <md-autocomplete #auto="mdAutocomplete">
+        <md-option *ngFor="let category of filteredCategories | async" [value]="category.id">
+          {{ category.name }}
+        </md-option>
+      </md-autocomplete>
+      
     </md-card>
     <md-card *ngFor="let category of user.categories" class="margin-bottom-10">
       {{ category }}
@@ -46,4 +53,9 @@
     <!--</md-card>-->
   <!--</ng-template>-->
   <!--<md-progress-bar mode="indeterminate" *ngIf="userActivityStream.loading"></md-progress-bar>-->
+  <!--<div class="eventful-badge eventful-large">-->
+    <!--<img src="http://api.eventful.com/images/powered/eventful_139x44.gif"-->
+         <!--alt="Local Events, Concerts, Tickets">-->
+    <!--<p><a href="http://eventful.com/">Events</a> by Eventful</p>-->
+  <!--</div>-->
 </form>

@@ -5,6 +5,7 @@ import {User} from "../models/User";
 import {ApiStream} from "../services/api/api-stream.service";
 import {UserActivity} from "../models/UserActivity";
 import {Constants} from "../models/Constants";
+import {EventfulCategory} from "../models/EventfulCategory"
 
 @Injectable()
 export class UserActivityStream extends ApiStream<UserActivity> {
@@ -12,6 +13,7 @@ export class UserActivityStream extends ApiStream<UserActivity> {
   public ready: boolean = false;
   public loading: boolean = false;
   private user: User = null;
+  private categories: EventfulCategory[] = [];
 
   constructor(http: Http, userService: UserService) {
     super(http, userService);
@@ -33,5 +35,27 @@ export class UserActivityStream extends ApiStream<UserActivity> {
       err => this.loading = false
     );
     return getAll
+  }
+
+  public getCategories() {
+    return new Promise<EventfulCategory[]>((resolve, reject) => {
+      if (this.categories && this.categories.length > 0) {
+        return resolve(this.categories)
+      }
+
+      this.http.get(`http://api.eventful.com/json/categories/list?app_key=${Constants.EVENTFUL_APP_KEY}`)
+      .map(res => res.json())
+      .subscribe(
+        (categories: EventfulCategory[]) => {
+          this.categories = categories;
+          console.log(this.categories);
+          resolve(this.categories);
+        },
+        err => {
+          console.error(err);
+          reject(err)
+        }
+      )
+    })
   }
 }

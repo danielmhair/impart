@@ -26,7 +26,7 @@ export abstract class ApiStream<T extends ApiModel> extends BehaviorSubject<T[]>
   protected updateStream: Subject<T> = new Subject<T>();
   private updates: ReplaySubject<IOperation<T>> = new ReplaySubject<IOperation<T>>();
 
-  constructor(private http: Http, private userService: UserService) {
+  constructor(protected http: Http, private userService: UserService) {
     super(null);
 
     this.mainStream = this.updates

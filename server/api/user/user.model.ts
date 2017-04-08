@@ -4,37 +4,21 @@ import { Schema, model, Document } from 'mongoose';
 import { pbkdf2Sync, randomBytes } from 'crypto';
 const authTypes = ['github', 'twitter', 'facebook', 'google', 'foursquare', 'anonymous'];
 
-export interface IRumor {
-  messageID: string;
-  Originator: string;
-  Text: string;
-}
-
-export interface IRumorInfo {
-  Rumor: IRumor;
-  EndPoint: string;
-}
-
 export interface IUser extends Document {
-  name: string;
-  email: string;
-  phone: number;
-  username: string;
-  password: string;
-  role: string;
-  seed: boolean;
-  rumors: IRumorInfo[];
-  nodeEndpoint: string;
-  neighbors: string[];
-  uuid: String;
-  permissions: string[];
-  hashedPassword: string;
-  provider: string;
-  salt: string;
+  name: String,
+  email: String,
+  phone: Number,
+  categories: string[],
+  username: string,
+  role: string,
+  nodeEndpoint: string,
+  uuid: string,
+  hashedPassword: string,
+  provider: string,
+  salt: string,
   facebook: Object;
   twitter: Object;
   google: Object;
-  github: Object;
   foursquare: Object;
   authenticate: Function;
 }
@@ -43,12 +27,12 @@ let UserSchema: Schema = new Schema({
   name: String,
   email: String,
   phone: Number,
+  categories: [],
   username: String,
   role: {
     type: String,
     default: 'user'
   },
-  seed: { type: Boolean, default: false },
   nodeEndpoint: String,
   uuid: String,
   hashedPassword: String,
@@ -57,26 +41,7 @@ let UserSchema: Schema = new Schema({
   facebook: {},
   twitter: {},
   google: {},
-  github: {},
   foursquare: {},
-  categories: [],
-
-  // TODO Both the the arrays below can be put into one other collection (userId:followerId)
-  // To get people following you, search by { userId: userId }
-  // To get people your following, search by { followerId: userId }
-  // TODO Make activities a mongo document (we don't want an array for each user)
-  activities: [],
-  // TODO Remove properties below...
-  neighbors: [String],
-  permissions: [],
-  rumors: [{
-    Rumor: {
-      messageID: String,
-      Originator: String,
-      Text: String
-    },
-    EndPoint: String
-  }],
 });
 
 
@@ -197,4 +162,4 @@ UserSchema.methods = {
   }
 };
 
-export const UserModel = model<IUser>('User', UserSchema);
+export const User = model<IUser>('User', UserSchema);
