@@ -3,7 +3,7 @@
 import * as express from 'express';
 import * as passport from 'passport';
 import { AuthService } from '../auth.service';
-import { ServerSettings } from '../../config/environment';
+import { ServerSettings } from '../../config/ServerSettings';
 
 export const GoogleApi = express.Router();
 

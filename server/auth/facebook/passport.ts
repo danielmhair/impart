@@ -3,7 +3,7 @@ import * as uuid from 'node-uuid';
 import { Strategy } from 'passport-facebook';
 import { Utils } from '../../utils';
 import { UserController } from  '../../api/user/user.controller';
-import { ServerSettings } from '../../config/environment';
+import { ServerSettings } from '../../config/ServerSettings';
 
 class FacebookPassportSetup {
   public setup(User) {

@@ -2,7 +2,7 @@
 
 import { Router } from 'express';
 import * as passport from 'passport';
-import { ServerSettings } from '../config/environment';
+import { ServerSettings } from '../config/ServerSettings';
 import { UserModel } from '../api/user/user.model';
 
 import {LocalPassport} from './local/passport';

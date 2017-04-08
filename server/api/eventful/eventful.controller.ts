@@ -1,5 +1,5 @@
 import { HttpRequest } from "../http-request";
-import { ServerSettings } from "../../config/environment"
+import { ServerSettings } from "../../config/ServerSettings"
 import {EventfulEvent, EventfulEventParams, EventfulEventResult } from "../../models/Eventful.model";
 
 export class EventfulCategory {

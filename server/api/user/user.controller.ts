@@ -1,7 +1,7 @@
 'use strict';
 
 import { IUser, User } from './user.model';
-import { ServerSettings } from '../../config/environment';
+import { ServerSettings } from '../../config/ServerSettings';
 import * as jwt from 'jsonwebtoken';
 import * as uuid from 'node-uuid';
 import * as Q from 'q'

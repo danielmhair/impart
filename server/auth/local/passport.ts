@@ -1,6 +1,6 @@
 import * as passport from 'passport';
 import { Strategy } from 'passport-local';
-import { ServerSettings } from '../../config/environment';
+import { ServerSettings } from '../../config/ServerSettings';
 
 class LocalPassportSetup {
   public setup(User) {
