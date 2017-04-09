@@ -456,7 +456,7 @@ export class UserController {
     const users: IUser[] = await UserOperations.getAll();
     users.forEach( async (user) => {
     // Get the current user's followers
-    const followers: Object[] = await UserFollowerOperations.getBy(user._id);
+    const followers: IUser[] = await UserFollowerOperations.getUsersFollowers(user._id);
 
     // Get all of the activities for the current user
     ActivityUserOperations.getBy( { userId: user._id, isRecommendation: false } )
