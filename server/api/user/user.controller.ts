@@ -32,20 +32,20 @@ export class UserController {
     });
   };
 
-  public static getSuggestions(req, res) {
-    User.findById(req.params.id, (err, user: IUser) => {
-      if (err) return res.status(500).send(err);
-      if (!user) return res.status(404).send("Unable to get user");
-      return res.status(200).json(user.suggestions)
-    });
-  };
+  // public static getSuggestions(req, res) {
+  //   User.findById(req.params.id, (err, user: IUser) => {
+  //     if (err) return res.status(500).send(err);
+  //     if (!user) return res.status(404).send("Unable to get user");
+  //     return res.status(200).json(user.suggestions)
+  //   });
+  // };
 
   // public static resolveWant(userId, want) {
   //   return Q.Promise((resolve, reject) => {
   //     User.findById(userId, (err, userWithWant: IUser) => {
   //       if (err) return reject({status: 500, message: err});
   //       if (!userWithWant) return reject({status: 404, message: "Unable to get user"});
-  //       User.find({nodeEndpoint: want.EndPoint}, (err, userWithRumor: IUser) => {
+  //       User.find({nodeEndpoint: want.EndPoint}, (err, userWithSuggestions: IUser) => {
   //         if (err) return reject(err)
   //         if (!userWithRumor) return reject({status: 200, data: "User is not found"})
   //         if (!userWithRumor.rumors) userWithRumor.rumors = []
@@ -452,68 +452,90 @@ export class UserController {
     res.redirect('/');
   };
 
-  public static propagateSuggestions = async () => {
+  public static suggestActivitiesToOtherUsers = async () => {
     const users: IUser[] = await UserOperations.getAll();
-    console.log(users);
-
     users.forEach( async (user) => {
-      const followers: IUserFollower[] = await UserFollowerOperations.getBy(user._id);
-      // const suggestions: IActivityUser[] = ActivityOperations.getBy({userId: user._id, isRecommendation: false}).then((activityUsers: IActivityUser[]) => {
-      //   ActivityOperations.getBy({ userId: { $in: activityUsers.map(item => item.userId) } }).then((activities: IActivity[]) => { ... });
-      // });
+    // Get the current user's followers
+    const followers: Object[] = await UserFollowerOperations.getBy(user._id);
 
-      console.log("============");
-      console.log(user.username);
-      console.log(user.nodeEndpoint);
-      console.log("followers:");
-      console.log(followers);
-      console.log("============");
+    // Get all of the activities for the current user
+    ActivityUserOperations.getBy( { userId: user._id, isRecommendation: false } )
+      .then((activityUsers: IActivityUser[]) => {
+        ActivityOperations.getBy( { userId: { $in: activityUsers.map(item => item.userId) } } )
+        .then((activities: IActivity[]) => {
 
-      // if (user.neighbors.length > 0 && user.rumors.length > 0) {
-      if (followers.length > 0 /*&& suggestions.length > 0*/) {
-        let randomFollowerId = followers[Utils.getRandom(0, followers.length)];
-        const neighborFollowers = users.filter((follower) => {
-          if (follower._id == randomFollowerId) {
-            console.log("follower id is randomFollower")
-            return true
+          console.log("============");
+          console.log("users");
+          console.log(users);
+          console.log("current user: ");
+          console.log(user);
+          console.log("username: " + user.username);
+          console.log("user endpoint: " + user.nodeEndpoint);
+          console.log("followers:");
+          console.log(followers);
+          console.log("activities");
+          console.log(activities);
+          console.log("============");
+
+          // We only need to propagate if the user has followers and activities
+          if (followers.length > 0 && activities.length > 0) {
+
+            let randomFollowerId = followers[Utils.getRandom(0, followers.length)];
+
+            // Find the user that matches the random follwer id
+            const followerArray = users.filter((follower) => {
+              if (follower._id == randomFollowerId) {
+                //console.log("follower id is randomFollower")
+                return true
+              }
+              return false
+            });
+
+            // Saftey check that there is a follower in the array
+            console.log(followerArray)
+            if (followerArray.length == 0) {
+              console.log("I don't know what happened....");
+            }
+
+            let follower = followerArray[0];
+            console.log('Random follower id:' + randomFollowerId);
+
+            // Randomly pick to send a suggestion or a want
+            if (Utils.getRandom(0, 2) == 0) {
+
+              // Prepare a suggestion from the users activities
+              let randomSuggestion = activities[Utils.getRandom(0, activities.length)];
+
+              // UserController.createRumorFromRumor(randomNeighborId, randomRumor)
+              console.log("Sending random suggestion...");
+              console.log(randomSuggestion);
+
+              UserController.httpPost(follower.nodeEndpoint, {"Suggestion": randomSuggestion})
+              .then((response) => {
+                console.log(response)
+              })
+              .catch((err) => {
+                console.error(err)
+              });
+            } else {
+              // Prepare a want
+              const Want = UserController.prepareWant(user);
+              // UserController.resolveWant(randomNeighborId, Want)
+              console.log("Sending random want to...");
+              console.log(follower);
+
+              UserController.httpPost(follower.nodeEndpoint, {"Want": Want})
+              .then((response) => {
+                console.log(response)
+              })
+              .catch((err) => {
+                console.error(err)
+              });
+            }
           }
-          return false
         });
-        console.log(neighborFollowers)
-        if (neighborFollowers.length == 0) {
-          console.log("I don't know what happened....");
-        }
-        let neighborFollower = neighborFollowers[0]
-        console.log(randomFollowerId)
-        if (Utils.getRandom(0, 2) == 0) {
-          // Prepare a suggestion
-          let randomSuggestion = suggestions[Utils.getRandom(0, suggestions.length)];
-          // UserController.createRumorFromRumor(randomNeighborId, randomRumor)
-          console.log("Sending random suggestion...")
-          console.log(randomSuggestion)
-          UserController.httpPost(neighborFollower.nodeEndpoint, {"Suggestion": randomSuggestion})
-          .then((response) => {
-            console.log(response)
-          })
-          .catch((err) => {
-            console.error(err)
-          })
-        } else {
-          // Prepare a want
-          const Want = UserController.prepareWant(user);
-          // UserController.resolveWant(randomNeighborId, Want)
-          console.log("Sending random want...")
-          console.log(neighborFollower)
-          UserController.httpPost(neighborFollower.nodeEndpoint, {"Want": Want})
-          .then((response) => {
-            console.log(response)
-          })
-          .catch((err) => {
-            console.error(err)
-          })
-        }
-      }
-    })
+      });
+    });
   };
 
   public static prepareWant(user) {

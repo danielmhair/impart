@@ -29,9 +29,9 @@ export class ApiCtrl<T extends Document> {
     })
   }
 
-  public getBy(params: T): Q.Promise<T[]> {
-    return Q.Promise<T[]>((resolve, reject) => {
-      this.Collection.find(params, function(err, documents: T[]) {
+  public getBy(params: Object): Q.Promise<Object[]> {
+    return Q.Promise<Object[]>((resolve, reject) => {
+      this.Collection.find(params, function(err, documents: Object[]) {
         if (err) return reject(err);
         return resolve(documents)
       });
