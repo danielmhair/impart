@@ -31,7 +31,7 @@ class GooglePassportSetup {
               categories: []
             });
             if (user._id && !user.nodeEndpoint) {
-              user.nodeEndpoint = "https://www.danielmhair.com/api/users/suggestions?userId=" + user._id;
+              user.nodeEndpoint = "https://www.danielmhair.com/api/users" + user._id +"/suggestions";
             }
             if (!user.uuid) {
               user.uuid = uuid.v4();
@@ -41,24 +41,7 @@ class GooglePassportSetup {
               if (err) return done(err);
               done(err, user);
             });
-          } else {
-            user.google = profile._json;
-            if (user._id && !user.nodeEndpoint) {
-              user.nodeEndpoint = "https://www.danielmhair.com/api/users/suggestions?userId=" + user._id;
-            }
-            if (!user.uuid) {
-              user.uuid = uuid.v4();
-            }
-            console.log(user);
-            UserController.addNeighborAndSave(user)
-            .then(function(results) {
-              console.log(results);
-              done(null, user);
-            })
-            .catch(function(err) {
-              done(err);
-            })
-          }
+          } 
         });
       }
     ));
