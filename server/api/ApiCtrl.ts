@@ -29,6 +29,15 @@ export class ApiCtrl<T extends Document> {
     })
   }
 
+  public getBy(params: T): Q.Promise<T[]> {
+    return Q.Promise<T[]>((resolve, reject) => {
+      this.Collection.find(params, function(err, documents: T[]) {
+        if (err) return reject(err);
+        return resolve(documents)
+      });
+    })
+  }
+
   // Creates a new state in the DB.
   public create(activityUser: T): Q.Promise<T> {
     return Q.Promise<T>((resolve, reject) => {
