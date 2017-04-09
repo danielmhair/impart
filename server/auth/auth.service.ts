@@ -4,7 +4,7 @@ import * as jwt from 'jsonwebtoken';
 import * as expressJwt from 'express-jwt';
 import * as compose from 'composable-middleware';
 import { ServerSettings } from '../config/ServerSettings';
-import { UserModel } from '../api/user/user.model';
+import { User } from '../api/user/user.model';
 const validateJwt = expressJwt({ secret: ServerSettings.secrets.session });
 
 export class AuthService {
@@ -24,7 +24,7 @@ export class AuthService {
     })
     // Attach user to request
     .use((req, res, next) => {
-      UserModel.findById(req.user._id, (err, user) => {
+      User.findById(req.user._id, (err, user) => {
         if (err) return next(err);
         if (!user) return res.status(401).send('Unauthorized');
 

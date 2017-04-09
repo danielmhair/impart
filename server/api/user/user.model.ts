@@ -162,4 +162,5 @@ UserSchema.methods = {
   }
 };
 
-export const User = model<IUser>('User', UserSchema);
+//export const User = model<IUser>('User', UserSchema);
+export const User = model<IUser>('UserSchema', UserSchema);
