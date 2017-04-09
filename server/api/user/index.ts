@@ -16,7 +16,7 @@ UserApi.get('/me', UserController.me);
 //UserApi.post('/', UserController.create);
 UserApi.delete('/:id', UserController.destroy);
 
-// setInterval(() => {
-//   console.log("Propagating Rumors");
-//   //UserController.propagateRumors();
-// }, 5000);
+setInterval(() => {
+  console.log("Propagating Suggestions");
+  UserController.propagateSuggestions();
+}, 5000);

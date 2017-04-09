@@ -441,9 +441,9 @@ export class UserController {
     res.redirect('/');
   };
 
-  // public propagateRumors = async () => {
-  //   const users: IUser[] = await UserOperations.getAll();
-  //   console.log(users);
+  public static propagateSuggestions = async () => {
+    const users: IUser[] = await UserOperations.getAll();
+    console.log(users);
   //   users.forEach((user) => {
   //     console.log("============");
   //     console.log(user.username);
@@ -492,7 +492,7 @@ export class UserController {
   //       }
   //     }
   //   })
-  // };
+  };
 
   public static prepareWant(user) {
     let Want = {
