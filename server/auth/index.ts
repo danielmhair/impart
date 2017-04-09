@@ -18,11 +18,11 @@ import {GoogleApi} from './google';
 import {FoursquareApi} from './foursquare';
 
 // Passport Configuration
-// LocalPassport.setup(User);
-// FacebookPassport.setup(User);
-// GooglePassport.setup(User);
-// TwitterPassport.setup(User);
-// FoursquarePassport.setup(User);
+LocalPassport.setup(User);
+FacebookPassport.setup(User);
+GooglePassport.setup(User);
+TwitterPassport.setup(User);
+FoursquarePassport.setup(User);
 
 export const AuthApi = Router();
 
