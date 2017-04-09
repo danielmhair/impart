@@ -9,6 +9,7 @@ export interface IUser extends Document {
   email: String,
   phone: Number,
   categories: string[],
+  suggestions: string[],
   username: string,
   role: string,
   nodeEndpoint: string,
@@ -28,6 +29,7 @@ let UserSchema: Schema = new Schema({
   email: String,
   phone: Number,
   categories: [],
+  suggestions: [],
   username: String,
   role: {
     type: String,
@@ -118,7 +120,7 @@ UserSchema
 .pre('save', function(next) {
   if (!this.isNew) return next();
   if (!this.nodeEndpoint) {
-    this.nodeEndpoint = "https://www.danielmhair.com/api/users/" + this._id + "/rumors";
+    this.nodeEndpoint = "https://www.danielmhair.com/api/users/" + this._id + "/suggestions";
   }
   next()
 });

@@ -11,6 +11,15 @@ import {HttpRequest} from "../http-request";
 // import { Want } from "../../models/Want"
 import { UserOperations } from "../user/user.operations"
 
+import { Activity, IActivity } from '../activity/activity.model';
+import { ActivityOperations } from "../activity/activity.operations";
+
+import { ActivityUser, IActivityUser } from '../activity-user/activity-user.model';
+import { ActivityUserOperations } from "../activity-user/activity-user.operations";
+
+import { UserFollower, IUserFollower } from '../user-follower/user-follower.model';
+import { UserFollowerOperations } from "../user-follower/user-follower.operations";
+
 export class UserController {
   /**
    * Get list of users
@@ -23,13 +32,13 @@ export class UserController {
     });
   };
 
-  // public static getRumors(req, res) {
-  //   User.findById(req.params.id, (err, user: IUser) => {
-  //     if (err) return res.status(500).send(err);
-  //     if (!user) return res.status(404).send("Unable to get user");
-  //     return res.status(200).json(user.rumors)
-  //   });
-  // };
+  public static getSuggestions(req, res) {
+    User.findById(req.params.id, (err, user: IUser) => {
+      if (err) return res.status(500).send(err);
+      if (!user) return res.status(404).send("Unable to get user");
+      return res.status(200).json(user.suggestions)
+    });
+  };
 
   // public static resolveWant(userId, want) {
   //   return Q.Promise((resolve, reject) => {
@@ -320,60 +329,62 @@ export class UserController {
   /**
    * Creates a new user
    */
-  // public static create(req, res, next) {
-  //   let originator = req.body.originator;
-  //   let endpoint = req.body.endpoint;
-  //   let newUser = null;
-  //   if (originator && endpoint) {
-  //     newUser = new User({
-  //       nodeEndpoint: endpoint,
-  //       username: originator,
-  //       name: originator,
-  //       role: 'user',
-  //     });
-  //   } else {
-  //     newUser = new User(req.body);
-  //     newUser.nodeEndpoint = "https://www.danielmhair.com/api/users/" + newUser._id + "/rumors";
-  //     newUser.role = 'user';
-  //     newUser.provider = 'local';
-  //   }
-  //   newUser.uuid = uuid.v4();
-  //   newUser.seed = Utils.getRandom(0, 5) % 3 === 0;
-  //   if (newUser.provider === "anonymous") {
-  //     User.find({username: originator, provider: "anonymous"}, (err, users) => {
-  //       if (!err && users && users.length > 0) {
-  //         console.log("Found node endpoint with username. Don't need to add user.")
-  //         console.log(users)
-  //         let token = jwt.sign({_id: users[0]._id}, ServerSettings.secrets.session, {expiresIn: 60 * 5});
-  //         return res.status(200).json({token: token});
-  //       } else {
-  //         UserController.addNeighborAndSave(newUser)
-  //         .then((results) => {
-  //           console.log("Neighbors added...")
-  //           console.log(results);
-  //           let token = jwt.sign({_id: newUser._id}, ServerSettings.secrets.session, {expiresIn: 60 * 5});
-  //           console.log(token);
-  //           return res.status(200).json({token: token});
-  //         })
-  //         .catch((errResult) => {
-  //           return res.status(errResult.status).json(errResult.err);
-  //         })
-  //       }
-  //     })
-  //   } else {
-  //     UserController.addNeighborAndSave(newUser)
-  //     .then((results) => {
-  //       console.log("Neighbors added...")
-  //       console.log(results);
-  //       let token = jwt.sign({_id: newUser._id}, ServerSettings.secrets.session, {expiresIn: 60 * 5});
-  //       console.log(token);
-  //       return res.status(200).json({token: token});
-  //     })
-  //     .catch((errResult) => {
-  //       return res.status(errResult.status).json(errResult.err);
-  //     })
-  //   }
-  // };
+  public static create(req, res, next) {
+    console.log("create");
+    let originator = req.body.originator;
+    let endpoint = req.body.endpoint;
+    let newUser = null;
+    if (originator && endpoint) {
+      newUser = new User({
+        nodeEndpoint: endpoint,
+        username: originator,
+        name: originator,
+        role: 'user',
+      });
+    } else {
+      newUser = new User(req.body);
+      //newUser.nodeEndpoint = "https://www.danielmhair.com/api/users/" + newUser._id + "/rumors";
+      newUser.nodeEndpoint = "https://www.danielmhair.com/api/users/" + newUser._id + "/suggestions";
+      newUser.role = 'user';
+      newUser.provider = 'local';
+    }
+    newUser.uuid = uuid.v4();
+    newUser.seed = Utils.getRandom(0, 5) % 3 === 0;
+    if (newUser.provider === "anonymous") {
+      User.find({username: originator, provider: "anonymous"}, (err, users) => {
+        if (!err && users && users.length > 0) {
+          console.log("Found node endpoint with username. Don't need to add user.")
+          console.log(users)
+          let token = jwt.sign({_id: users[0]._id}, ServerSettings.secrets.session, {expiresIn: 60 * 5});
+          return res.status(200).json({token: token});
+        } else {
+          // UserController.addNeighborAndSave(newUser)
+          // .then((results) => {
+          //   console.log("Neighbors added...")
+          //   console.log(results);
+          //   let token = jwt.sign({_id: newUser._id}, ServerSettings.secrets.session, {expiresIn: 60 * 5});
+          //   console.log(token);
+          //   return res.status(200).json({token: token});
+          //  })
+          // .catch((errResult) => {
+          //   return res.status(errResult.status).json(errResult.err);
+          // })
+        }
+      })
+    } else {
+      // UserController.addNeighborAndSave(newUser)
+      // .then((results) => {
+      //   console.log("Neighbors added...")
+      //   console.log(results);
+      //   let token = jwt.sign({_id: newUser._id}, ServerSettings.secrets.session, {expiresIn: 60 * 5});
+      //   console.log(token);
+      //   return res.status(200).json({token: token});
+      //  })
+      // .catch((errResult) => {
+      //   return res.status(errResult.status).json(errResult.err);
+      // })
+    }
+  };
 
   /**
    * Get a single user
@@ -444,54 +455,65 @@ export class UserController {
   public static propagateSuggestions = async () => {
     const users: IUser[] = await UserOperations.getAll();
     console.log(users);
-  //   users.forEach((user) => {
-  //     console.log("============");
-  //     console.log(user.username);
-  //     console.log(user.nodeEndpoint);
-  //     if (user.neighbors.length > 0 && user.rumors.length > 0) {
-  //       let randomNeighborId = user.neighbors[Utils.getRandom(0, user.neighbors.length)];
-  //       const neighborUsers = users.filter((neighbor) => {
-  //         if (neighbor._id == randomNeighborId) {
-  //           console.log("neighbor id is randomNeighbor")
-  //           return true
-  //         }
-  //         return false
-  //       });
-  //       console.log(neighborUsers)
-  //       if (neighborUsers.length == 0) {
-  //         console.log("I don't what happened....");
-  //       }
-  //       let neighborUser = neighborUsers[0]
-  //       console.log(randomNeighborId)
-  //       if (Utils.getRandom(0, 2) == 0) {
-  //         // Prepare a rumor
-  //         let randomRumor = user.rumors[Utils.getRandom(0, user.rumors.length)];
-  //         // UserController.createRumorFromRumor(randomNeighborId, randomRumor)
-  //         console.log("Sending random rumor...")
-  //         console.log(randomRumor)
-  //         UserController.httpPost(neighborUser.nodeEndpoint, {"Rumor": randomRumor})
-  //         .then((response) => {
-  //           console.log(response)
-  //         })
-  //         .catch((err) => {
-  //           console.error(err)
-  //         })
-  //       } else {
-  //         // Prepare a want
-  //         const Want = UserController.prepareWant(user);
-  //         // UserController.resolveWant(randomNeighborId, Want)
-  //         console.log("Sending random want...")
-  //         console.log(neighborUser)
-  //         UserController.httpPost(neighborUser.nodeEndpoint, {"Want": Want})
-  //         .then((response) => {
-  //           console.log(response)
-  //         })
-  //         .catch((err) => {
-  //           console.error(err)
-  //         })
-  //       }
-  //     }
-  //   })
+
+    users.forEach( async (user) => {
+      const followers: IUserFollower[] = await UserFollowerOperations.getBy(user._id);
+      // const suggestions: IActivityUser[] = ActivityOperations.getBy({userId: user._id, isRecommendation: false}).then((activityUsers: IActivityUser[]) => {
+      //   ActivityOperations.getBy({ userId: { $in: activityUsers.map(item => item.userId) } }).then((activities: IActivity[]) => { ... });
+      // });
+
+      console.log("============");
+      console.log(user.username);
+      console.log(user.nodeEndpoint);
+      console.log("followers:");
+      console.log(followers);
+      console.log("============");
+
+      // if (user.neighbors.length > 0 && user.rumors.length > 0) {
+      if (followers.length > 0 /*&& suggestions.length > 0*/) {
+        let randomFollowerId = followers[Utils.getRandom(0, followers.length)];
+        const neighborFollowers = users.filter((follower) => {
+          if (follower._id == randomFollowerId) {
+            console.log("follower id is randomFollower")
+            return true
+          }
+          return false
+        });
+        console.log(neighborFollowers)
+        if (neighborFollowers.length == 0) {
+          console.log("I don't know what happened....");
+        }
+        let neighborFollower = neighborFollowers[0]
+        console.log(randomFollowerId)
+        if (Utils.getRandom(0, 2) == 0) {
+          // Prepare a suggestion
+          let randomSuggestion = suggestions[Utils.getRandom(0, suggestions.length)];
+          // UserController.createRumorFromRumor(randomNeighborId, randomRumor)
+          console.log("Sending random suggestion...")
+          console.log(randomSuggestion)
+          UserController.httpPost(neighborFollower.nodeEndpoint, {"Suggestion": randomSuggestion})
+          .then((response) => {
+            console.log(response)
+          })
+          .catch((err) => {
+            console.error(err)
+          })
+        } else {
+          // Prepare a want
+          const Want = UserController.prepareWant(user);
+          // UserController.resolveWant(randomNeighborId, Want)
+          console.log("Sending random want...")
+          console.log(neighborFollower)
+          UserController.httpPost(neighborFollower.nodeEndpoint, {"Want": Want})
+          .then((response) => {
+            console.log(response)
+          })
+          .catch((err) => {
+            console.error(err)
+          })
+        }
+      }
+    })
   };
 
   public static prepareWant(user) {
