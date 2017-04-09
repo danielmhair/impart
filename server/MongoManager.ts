@@ -14,7 +14,7 @@ import * as _ from 'lodash';
 import * as errno from 'errno';
 import * as path from 'path';
 import { MongoClient } from 'mongodb';
-import { DatabaseSettings } from "./DatabaseSettings";
+import { DatabaseSettings } from "./config/DatabaseSettings";
 import * as mongoose from 'mongoose';
 import * as logger from 'winston';
 const fse = require('fs-extra');

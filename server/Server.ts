@@ -25,7 +25,7 @@ import * as favicon from 'serve-favicon';
 const mongoStore = connectMongo(session);
 
 // Your own modules
-import { DatabaseSettings } from './DatabaseSettings';
+import { DatabaseSettings } from './config/DatabaseSettings';
 import { MongoManager } from './MongoManager';
 import { ServerSettings } from './config/ServerSettings';
 import { UserApi } from './api/user';
