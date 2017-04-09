@@ -9,6 +9,7 @@ import { Utils } from '../../utils';
 import {HttpRequest} from "../http-request";
 // import { Suggestion } from "../../models/Suggestion"
 // import { Want } from "../../models/Want"
+import { UserOperations } from "../user/user.operations"
 
 export class UserController {
   /**
@@ -440,57 +441,56 @@ export class UserController {
     res.redirect('/');
   };
 
-  public static propagateRumors = () => {
-    User.find({}, (err, users) => {
-      console.log(users)
-      users.forEach((user) => {
-        console.log("============")
-        console.log(user.username)
-        console.log(user.nodeEndpoint)
-        if (user.neighbors.length > 0 && user.rumors.length > 0) {
-          let randomNeighborId = user.neighbors[Utils.getRandom(0, user.neighbors.length)];
-          const neighborUsers = users.filter((neighbor) => {
-            if (neighbor._id == randomNeighborId) {
-              console.log("neighbor id is randomNeighbor")
-              return true
-            }
-            return false
-          });
-          console.log(neighborUsers)
-          if (neighborUsers.length == 0) {
-            console.log("I don't what happened....");
+  public propagateRumors = async () => {
+    const users: IUser[] = await UserOperations.getAll();
+    console.log(users);
+    users.forEach((user) => {
+      console.log("============");
+      console.log(user.username);
+      console.log(user.nodeEndpoint);
+      if (user.neighbors.length > 0 && user.rumors.length > 0) {
+        let randomNeighborId = user.neighbors[Utils.getRandom(0, user.neighbors.length)];
+        const neighborUsers = users.filter((neighbor) => {
+          if (neighbor._id == randomNeighborId) {
+            console.log("neighbor id is randomNeighbor")
+            return true
           }
-          let neighborUser = neighborUsers[0]
-          console.log(randomNeighborId)
-          if (Utils.getRandom(0, 2) == 0) {
-            // Prepare a rumor
-            let randomRumor = user.rumors[Utils.getRandom(0, user.rumors.length)];
-            // UserController.createRumorFromRumor(randomNeighborId, randomRumor)
-            console.log("Sending random rumor...")
-            console.log(randomRumor)
-            UserController.httpPost(neighborUser.nodeEndpoint, {"Rumor": randomRumor})
-            .then((response) => {
-              console.log(response)
-            })
-            .catch((err) => {
-              console.error(err)
-            })
-          } else {
-            // Prepare a want
-            const Want = UserController.prepareWant(user);
-            // UserController.resolveWant(randomNeighborId, Want)
-            console.log("Sending random want...")
-            console.log(neighborUser)
-            UserController.httpPost(neighborUser.nodeEndpoint, {"Want": Want})
-            .then((response) => {
-              console.log(response)
-            })
-            .catch((err) => {
-              console.error(err)
-            })
-          }
+          return false
+        });
+        console.log(neighborUsers)
+        if (neighborUsers.length == 0) {
+          console.log("I don't what happened....");
         }
-      })
+        let neighborUser = neighborUsers[0]
+        console.log(randomNeighborId)
+        if (Utils.getRandom(0, 2) == 0) {
+          // Prepare a rumor
+          let randomRumor = user.rumors[Utils.getRandom(0, user.rumors.length)];
+          // UserController.createRumorFromRumor(randomNeighborId, randomRumor)
+          console.log("Sending random rumor...")
+          console.log(randomRumor)
+          UserController.httpPost(neighborUser.nodeEndpoint, {"Rumor": randomRumor})
+          .then((response) => {
+            console.log(response)
+          })
+          .catch((err) => {
+            console.error(err)
+          })
+        } else {
+          // Prepare a want
+          const Want = UserController.prepareWant(user);
+          // UserController.resolveWant(randomNeighborId, Want)
+          console.log("Sending random want...")
+          console.log(neighborUser)
+          UserController.httpPost(neighborUser.nodeEndpoint, {"Want": Want})
+          .then((response) => {
+            console.log(response)
+          })
+          .catch((err) => {
+            console.error(err)
+          })
+        }
+      }
     })
   };
 

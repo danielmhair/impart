@@ -11,8 +11,8 @@ export class ApiCtrl<T extends Document> {
     this.Collection = model;
   }
 
-  public getAll() {
-    return Q.Promise((resolve, reject) => {
+  public getAll(): Q.Promise<T[]> {
+    return Q.Promise<T[]>((resolve, reject) => {
       this.Collection.find({}, function(err, documents: T[]) {
         if (err) return reject(err);
         return resolve(documents)
@@ -20,8 +20,8 @@ export class ApiCtrl<T extends Document> {
     })
   }
 
-  public getById(id: string) {
-    return Q.Promise((resolve, reject) => {
+  public getById(id: string): Q.Promise<T> {
+    return Q.Promise<T>((resolve, reject) => {
       this.Collection.findById(id, function (err, document: T) {
         if (err) return reject(err);
         return resolve(document)
@@ -30,8 +30,8 @@ export class ApiCtrl<T extends Document> {
   }
 
   // Creates a new state in the DB.
-  public create(activityUser: T) {
-    return Q.Promise((resolve, reject) => {
+  public create(activityUser: T): Q.Promise<T> {
+    return Q.Promise<T>((resolve, reject) => {
       this.Collection.create(activityUser, function (err, document: T) {
         if (err) return reject(err);
         return resolve(document)
@@ -40,8 +40,8 @@ export class ApiCtrl<T extends Document> {
   }
 
   // Updates an existing state in the DB.
-  public update(activityUser: T) {
-    return Q.Promise((resolve, reject) => {
+  public update(activityUser: T): Q.Promise<T> {
+    return Q.Promise<T>((resolve, reject) => {
       this.Collection.findById(activityUser._id, function (err, document: T) {
         if (err) {
           return reject(err);
@@ -59,8 +59,8 @@ export class ApiCtrl<T extends Document> {
   }
 
   // // Deletes a state from the DB.
-  public destroy(id: string) {
-    return Q.Promise((resolve, reject) => {
+  public destroy(id: string): Q.Promise<String> {
+    return Q.Promise<String>((resolve, reject) => {
       this.Collection.find({_id: id}).remove(function (err) {
         if (err) {
           return reject(err);
