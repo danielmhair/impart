@@ -1,6 +1,6 @@
 import { HttpRequest } from "../http-request";
 import { ServerSettings } from "../../config/ServerSettings"
-import {EventfulEvent, EventfulEventParams, EventfulEventResult } from "../../models/Eventful.model";
+import {EventfulEvent, EventfulEventParams, EventfulEventResult } from "../../models/Eventful";
 
 export class EventfulCategory {
   id: string;
