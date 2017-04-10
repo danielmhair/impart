@@ -67,34 +67,38 @@ export class UserController {
   //   });
   // };
 
-  // public static createRumorFromRumor(userId, rumor) {
-  //   return Q.Promise((resolve, reject) => {
-  //     console.log("CREATING RUMOR FROM RUMOR");
-  //     console.log(userId);
-  //     console.log(rumor);
-  //     console.log(rumor.Rumor.Text)
-  //     User.findById(userId, (err, user) => {
-  //       if (err) {
-  //         console.error(err)
-  //         return reject({status: 500, message: err});
-  //       }
-  //       if (!user) return reject({status: 404, message: "Unable to get user"})
-  //       let exists = user.rumors.filter((eaRumor) => {
-  //           return eaRumor.Rumor.messageID == rumor.Rumor.messageID
-  //         }).length > 0;
-  //       console.log("Exists? " + exists)
-  //       if (!exists) {
-  //         user.rumors.push(rumor);
-  //         user.save((err) => {
-  //           if (err) return reject({status: 500, message: err});
-  //           return resolve(rumor)
-  //         })
-  //       } else {
-  //         return resolve(rumor)
-  //       }
-  //     });
-  //   });
-  // };
+   public static createSuggestionFromSuggestion(userId, suggestion) {
+     return Q.Promise((resolve, reject) => {
+       console.log("CREATING SUGGESTION FROM SUGGESTION");
+       console.log("THIS USER IS LOOKING AT A SUGGESTION: " + userId + ": ");
+       console.log(suggestion);
+       User.findById(userId, (err, user) => {
+          if (err) {
+            console.error(err)
+            return reject({status: 500, message: err});
+          }
+          if (!user) return reject({status: 404, message: "Unable to get user with id: " + userId + "to create acivity-user"})
+          const activities: IActivity[] = await UserFollowerOperations.getUsersActivites(userId);
+          //check if the categories in the suggestion match this users suggestions
+          let exists = activities.filter(activity => {
+            return activity._id == suggestion._id
+            }).length > 0
+          //make sure one or more of the categories also match.
+          let matches = user.categories.filter((eaCategory) => {
+            suggestion.categories.indexOf(eaCategory) >= 0
+            }).length > 0;
+          console.log("Exists? " + exists)
+          console.log("Matches? " + matches)
+          // if the user is not already associated with the activity, and the activity matches one or more of his categories
+          if (!exists && matches) {
+            UserFollowerOperations.create(suggestion)
+          } else {
+            console.log("SUGGESTION THROWN OUT BECAUSE IT ALREADY EXISTS OR DOESN'T MATCH ANY CATEGORIES")
+            return resolve(suggestion)
+          }
+       });
+     });
+   };
 
   // public static createRumorFromMessage(userId, message) {
   //   return Q.Promise((resolve, reject) => {
@@ -124,40 +128,27 @@ export class UserController {
   //   })
   // };
 
-   public static resolveRumor(userId, rumor) {
-     return Q.Promise((resolve, reject) => {
-     let resultPromise = null;
-       console.log("Resolving rumor")
-       console.log(rumor.EndPoint)
-       User.findOne({nodeEndpoint: rumor.EndPoint}, (err, user) => {
-         if (err) {
-           console.log(err)
-           return reject({status: 500, message: err});
-         }
-         if (!user) {
-           console.log("There is no user, creating new User...")
-           let newUser = new User({
-             name: rumor.Rumor.Originator,
-             username: rumor.Rumor.Originator,
-             seed: true,
-             rumors: [rumor],
-             nodeEndpoint: rumor.EndPoint,
-             neighbors: [],
-             uuid: rumor.Rumor.messageID.split(":")[0]
-           });
-           console.log("Saving user")
-           console.log(newUser)
-           resultPromise = UserController.saveUser(newUser);
-         } else {
-           console.log("There is a user")
-           resultPromise = UserController.createRumorFromRumor(userId, rumor);
-         }
-         resultPromise
-         .then(resolve)
-         .catch(reject)
-       });
-     });
-   }
+   public static resolveSuggestion(userId, suggestion) {
+    return Q.Promise((resolve, reject) => {
+      let resultPromise = null;
+      console.log("Resolving Suggestion")
+     User.findById(userId, (err, user)  => {
+        if (err) {
+          console.log(err)
+          return reject({status: 500, message: err});
+        }
+        if (!user) {
+          return reject({status: 404, message: "User not found"})
+        } else {
+          console.log("There is a user")
+          resultPromise = UserController.createSuggestionFromSuggestion(userId, suggestion);
+        }
+        resultPromise
+        .then(resolve)
+        .catch(reject)
+      });
+    });
+  }
 
   // public static createRumorReq(req, res) {
   //   //if the message coming in is a rumor do something
@@ -175,7 +166,7 @@ export class UserController {
   //       resultPromise = UserController.resolveRumorWithNoUser(rumor)
   //     } else {
   //       console.log("User exists, update user with new rumor")
-  //       resultPromise = UserController.resolveRumor(userId, rumor)
+  //       resultPromise = UserController.resolveSuggestion(userId, rumor)
   //     }
   //   } else if (want) {
   //     console.log(want)
