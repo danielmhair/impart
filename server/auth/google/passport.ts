@@ -41,7 +41,20 @@ class GooglePassportSetup {
               if (err) return done(err);
               done(err, user);
             });
-          } 
+          } else {
+            user.google = profile._json;
+            if (user._id && !user.nodeEndpoint) {
+              user.nodeEndpoint = "https://www.danielmhair.com/api/users" + user._id + "/suggestions";
+            }
+            if (!user.uuid) {
+              user.uuid = uuid.v4();
+            }
+            console.log(user);
+           user.save(function(err) {
+              if (err) return done(err);
+              done(err, user);
+            });
+          }
         });
       }
     ));
