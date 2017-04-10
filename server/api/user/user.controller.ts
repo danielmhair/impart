@@ -155,41 +155,41 @@ export class UserController {
     });
   }
 
-  // public static createRumorReq(req, res) {
-  //   //if the message coming in is a rumor do something
-  //   console.log("======================== CREATE RUMOR REQ =========================");
-  //   let rumor = req.body.Rumor;
-  //   let want = req.body.Want;
-  //   let userId = req.params.id;
-  //   console.log("Getting user from id: " + userId);
-  //   let resultPromise = null;
-  //   if (rumor) {
-  //     console.log("Creating rumor ")
-  //     console.log(rumor.Rumor)
-  //     if (!userId) {
-  //       console.log("No user, creating user then rumor...")
-  //       resultPromise = UserController.resolveRumorWithNoUser(rumor)
-  //     } else {
-  //       console.log("User exists, update user with new rumor")
-  //       resultPromise = UserController.resolveSuggestion(userId, suggestion)
-  //     }
-  //   } else if (want) {
-  //     console.log(want)
-  //     resultPromise = UserController.resolveWant(userId, want);
-  //   } else {
-  //     console.log("Creating rumor...");
-  //     console.log(req.body.message);
-  //     resultPromise = UserController.createRumorFromMessage(userId, req.body.message);
-  //   }
+  public static createRumorReq(req, res) {
+    //if the message coming in is a rumor do something
+    console.log("======================== CREATE RUMOR REQ =========================");
+    let suggestion = req.body.Suggestion;
+    let want = req.body.Want;
+    let userId = req.params.id;
+    console.log("Getting user from id: " + userId);
+    let resultPromise = null;
+    if (suggestion) {
+      console.log("Creating suggestion ")
+      console.log(suggestion.Suggestion)
+      if (!userId) {
+        res.status(404).send("Unable to find user")
+      } else {
+        console.log("User exists, update user with incoming suggestion")
+        resultPromise = UserController.resolveSuggestion(userId, suggestion)
+      }
+    } else if (want) {
+      console.log(want)
+      //not finished refactoring resolveWant yet
+      //resultPromise = UserController.resolveWant(userId, want);
+    } else {
+      console.log("Creating rumor from a message from the client");
+      //console.log(req.body.message);
+      //resultPromise = UserController.createRumorFromMessage(userId, req.body.message);
+    }
 
-  //   resultPromise
-  //   .then((result) => {
-  //     res.status(200).json(result)
-  //   })
-  //   .catch((err) => {
-  //     res.status(500).json(err)
-  //   })
-  // };
+    resultPromise
+    .then((result) => {
+      res.status(200).json(result)
+    })
+    .catch((err) => {
+      res.status(500).json(err)
+    })
+  };
 
   // public static resolveRumorWithNoUser(rumor) {
   //   return UserController.createAnonymous(rumor.Rumor.Originator, rumor.EndPoint)
