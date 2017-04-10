@@ -12,8 +12,7 @@ UserApi.put('/:id/password', UserController.changePassword);
 UserApi.get('/:id/suggestions', UserController.getRumors);
 UserApi.get('/me', UserController.me);
 
-UserApi.post('/:id/rumors', UserController.createRumorReq);
-UserApi.post('/', UserController.create);
+UserApi.post('/:id/suggestions', UserController.createRumorReq);
 UserApi.delete('/:id', UserController.destroy);
 
 setInterval(() => {
