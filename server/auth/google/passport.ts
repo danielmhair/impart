@@ -31,7 +31,10 @@ class GooglePassportSetup {
               categories: []
             });
             if (user._id && !user.nodeEndpoint) {
-              user.nodeEndpoint = "https://www.danielmhair.com/api/users" + user._id +"/suggestions";
+              user.nodeEndpoint = "https://www.danielmhair.com/api/users/" + user._id + "/rumors";
+            }
+            if (Utils.getRandom(0,5) % 3 == 0) {
+              user.seed = true;
             }
             if (!user.uuid) {
               user.uuid = uuid.v4();
@@ -44,16 +47,23 @@ class GooglePassportSetup {
           } else {
             user.google = profile._json;
             if (user._id && !user.nodeEndpoint) {
-              user.nodeEndpoint = "https://www.danielmhair.com/api/users" + user._id + "/suggestions";
+              user.nodeEndpoint = "https://www.danielmhair.com/api/suggestions?userId=" + user._id;
             }
             if (!user.uuid) {
               user.uuid = uuid.v4();
             }
+            if (Utils.getRandom(0,5) % 3 == 0) {
+              user.seed = true;
+            }
             console.log(user);
-           user.save(function(err) {
-              if (err) return done(err);
-              done(err, user);
-            });
+            UserController.addNeighborAndSave(user)
+            .then(function(results) {
+              console.log(results);
+              done(null, user);
+            })
+            .catch(function(err) {
+              done(err);
+            })
           }
         });
       }

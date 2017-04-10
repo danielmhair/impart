@@ -31,22 +31,32 @@ class FacebookPassportSetup {
                 facebook: profile._json
               });
               if (user._id && !user.nodeEndpoint) {
-                user.nodeEndpoint = "https://www.danielmhair.com/api/users/" + user._id + "/suggestions";
+                user.nodeEndpoint = "https://www.danielmhair.com/api/users/" + user._id + "/rumors";
               }
               if (!user.uuid) {
                 user.uuid = uuid.v4();
               }
-              user.save(function(err) {
-                if (err) return done(err);
-                done(err, user);
-              });
+              if (Utils.getRandom(0,5) % 3 == 0) {
+                user.seed = true;
+              }
+              UserController.addNeighborAndSave(user)
+              .then(function(results) {
+                console.log(results);
+                done(null, user);
+              })
+              .catch(function(err) {
+                done(err);
+              })
             } else {
               user.facebook = profile._json;
               if (user._id && !user.nodeEndpoint) {
-                user.nodeEndpoint = "https://www.danielmhair.com/api/users/" + user._id + "/suggestions";
+                user.nodeEndpoint = "https://www.danielmhair.com/api/users/" + user._id + "/rumors";
               }
               if (!user.uuid) {
                 user.uuid = uuid.v4();
+              }
+              if (Utils.getRandom(0,5) % 3 == 0) {
+                user.seed = true;
               }
               user.save(function(err) {
                 if (err) return done(err);

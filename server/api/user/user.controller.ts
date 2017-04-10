@@ -126,7 +126,19 @@ export class UserController {
           return reject({status: 500, message: err});
         }
         if (!user) {
-          return reject({status: 404, message: "User not found"})
+          console.log("There is no user, creating new User...")
+          let newUser = new User({
+            name: rumor.Rumor.Originator,
+            username: rumor.Rumor.Originator,
+            seed: true,
+            rumors: [rumor],
+            nodeEndpoint: rumor.EndPoint,
+            neighbors: [],
+            uuid: rumor.Rumor.messageID.split(":")[0]
+          });
+          console.log("Saving user")
+          console.log(newUser)
+          resultPromise = UserController.saveUser(newUser);
         } else {
           console.log("There is a user")
           resultPromise = UserController.createRumorFromRumor(userId, rumor);
@@ -180,6 +192,188 @@ export class UserController {
       return UserController.resolveRumor(newUser._id, rumor)
     })
   }
+
+  public static addNeighborAndSave(newUser) {
+    console.log("Adding neighbor and saving");
+    return Q.Promise((resolve, reject) => {
+      if (newUser.seed) {
+        // Put all the other seeds as its neighbors and give me to them as a neighbor
+        User.find({seed: true}, (err, users) => {
+          if (err) {
+            console.error(err);
+            return reject({status: 500, message: err});
+          }
+          if (!users) return reject({status: 404, err: "Unable to get users."});
+
+          let operations = [];
+          users.forEach((user) => {
+            if (newUser._id != user._id) {
+              if (user.neighbors.indexOf(newUser._id) == -1) {
+                user.neighbors.push(newUser._id);
+                operations.push(UserController.saveUser(user))
+              }
+              if (newUser.neighbors.indexOf(user._id) == -1) {
+                //user not in neighbors
+                newUser.neighbors.push(user._id);
+                operations.push(UserController.saveUser(newUser))
+              }
+            }
+          });
+
+          Q.all(operations)
+          .then((results) => {
+            console.log(results);
+            return resolve(results);
+          })
+          .catch((err) => {
+            console.error(err);
+            return reject({status: 500, err: err});
+          })
+        })
+      } else {
+        console.log("Not a seed");
+        User.find({seed: true}, (err, users) => {
+          if (err) return reject({status: 500, err: err});
+          if (!users) return reject({status: 404, err: "Unable to get users."})
+
+          // Add one of the seeds as its neighbor
+          if (users.length > 0) {
+            let index = Utils.getRandom(0, users.length);
+            let user = users[index];
+            console.log(index);
+            console.log(users);
+            newUser.neighbors.push(user._id);
+            // The seed user will have this new user as a neighbor
+            user.neighbors.push(newUser._id);
+
+            Q.all([
+              UserController.saveUser(newUser),
+              UserController.saveUser(user)
+            ])
+            .then((results) => {
+              console.log(results);
+              return resolve(users);
+            })
+            .catch((err) => {
+              console.log(err);
+              return reject({status: 500, err: err});
+            })
+          } else {
+            console.log("no seeds, default to seed");
+            //if there are no seeds yet, default this guy to seed.
+            newUser.seed = true;
+
+            UserController.saveUser(newUser)
+            .then((user) => {
+              return resolve(user);
+            })
+            .catch((err) => {
+              console.log(err);
+              return reject({status: 500, err: err});
+            })
+          }
+        })
+      }
+    })
+  }
+
+  /**
+   * Creates a new user
+   */
+  public static createAnonymous(originator, endpoint) {
+    return Q.Promise((resolve, reject) => {
+      let newUser = null;
+      if (originator && endpoint) {
+        newUser = new User({
+          nodeEndpoint: endpoint,
+          username: originator,
+          name: originator,
+          role: 'user',
+          provider: 'anonymous'
+        });
+      }
+      newUser.uuid = uuid.v4();
+      newUser.seed = Utils.getRandom(0, 5) % 3 === 0;
+      User.find({username: originator, provider: "anonymous"}, (err, users) => {
+        if (!err && users && users.length > 0) {
+          console.log("Found node endpoint with username. Don't need to add user.")
+          console.log(users)
+          const token = jwt.sign({_id: users[0]._id}, ServerSettings.secrets.session, {expiresIn: 60 * 5});
+          return resolve({token: token});
+        } else {
+          UserController.addNeighborAndSave(newUser)
+          .then((results) => {
+            console.log("Neighbors added...")
+            console.log(results);
+            const token = jwt.sign({_id: newUser._id}, ServerSettings.secrets.session, {expiresIn: 60 * 5});
+            console.log(token);
+            return resolve({token: token});
+          })
+          .catch((errResult) => {
+            return reject(errResult.err);
+          })
+        }
+      })
+    })
+  };
+
+  /**
+   * Creates a new user
+   */
+  public static create(req, res, next) {
+    let originator = req.body.originator;
+    let endpoint = req.body.endpoint;
+    let newUser = null;
+    if (originator && endpoint) {
+      newUser = new User({
+        nodeEndpoint: endpoint,
+        username: originator,
+        name: originator,
+        role: 'user',
+      });
+    } else {
+      newUser = new User(req.body);
+      newUser.nodeEndpoint = "https://www.danielmhair.com/api/users/" + newUser._id + "/rumors";
+      newUser.role = 'user';
+      newUser.provider = 'local';
+    }
+    newUser.uuid = uuid.v4();
+    newUser.seed = Utils.getRandom(0, 5) % 3 === 0;
+    if (newUser.provider === "anonymous") {
+      User.find({username: originator, provider: "anonymous"}, (err, users) => {
+        if (!err && users && users.length > 0) {
+          console.log("Found node endpoint with username. Don't need to add user.")
+          console.log(users)
+          let token = jwt.sign({_id: users[0]._id}, ServerSettings.secrets.session, {expiresIn: 60 * 5});
+          return res.status(200).json({token: token});
+        } else {
+          UserController.addNeighborAndSave(newUser)
+          .then((results) => {
+            console.log("Neighbors added...")
+            console.log(results);
+            let token = jwt.sign({_id: newUser._id}, ServerSettings.secrets.session, {expiresIn: 60 * 5});
+            console.log(token);
+            return res.status(200).json({token: token});
+          })
+          .catch((errResult) => {
+            return res.status(errResult.status).json(errResult.err);
+          })
+        }
+      })
+    } else {
+      UserController.addNeighborAndSave(newUser)
+      .then((results) => {
+        console.log("Neighbors added...")
+        console.log(results);
+        let token = jwt.sign({_id: newUser._id}, ServerSettings.secrets.session, {expiresIn: 60 * 5});
+        console.log(token);
+        return res.status(200).json({token: token});
+      })
+      .catch((errResult) => {
+        return res.status(errResult.status).json(errResult.err);
+      })
+    }
+  };
 
   /**
    * Get a single user
