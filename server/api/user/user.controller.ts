@@ -79,10 +79,12 @@ export class UserController {
           }
           if (!user) return reject({status: 404, message: "Unable to get user with id: " + userId + "to create acivity-user"})
           const activities: IActivity[] = await UserFollowerOperations.getUsersActivites(userId);
+          
           //check if the categories in the suggestion match this users suggestions
           let exists = activities.filter(activity => {
             return activity._id == suggestion._id
             }).length > 0
+
           //make sure one or more of the categories also match.
           let matches = user.categories.filter((eaCategory) => {
             suggestion.categories.indexOf(eaCategory) >= 0
@@ -91,7 +93,10 @@ export class UserController {
           console.log("Matches? " + matches)
           // if the user is not already associated with the activity, and the activity matches one or more of his categories
           if (!exists && matches) {
+            suggestion.userId = userId
             UserFollowerOperations.create(suggestion)
+            .then((document: IUserFollower) => res.status(201).json(document))
+            .catch(err => UserFollowerCtrl.handleError(res, err))
           } else {
             console.log("SUGGESTION THROWN OUT BECAUSE IT ALREADY EXISTS OR DOESN'T MATCH ANY CATEGORIES")
             return resolve(suggestion)
