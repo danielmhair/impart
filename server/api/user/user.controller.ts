@@ -124,40 +124,40 @@ export class UserController {
   //   })
   // };
 
-  // public static resolveRumor(userId, rumor) {
-  //   return Q.Promise((resolve, reject) => {
-  //     let resultPromise = null;
-  //     console.log("Resolving rumor")
-  //     console.log(rumor.EndPoint)
-  //     User.findOne({nodeEndpoint: rumor.EndPoint}, (err, user) => {
-  //       if (err) {
-  //         console.log(err)
-  //         return reject({status: 500, message: err});
-  //       }
-  //       if (!user) {
-  //         console.log("There is no user, creating new User...")
-  //         let newUser = new User({
-  //           name: rumor.Rumor.Originator,
-  //           username: rumor.Rumor.Originator,
-  //           seed: true,
-  //           rumors: [rumor],
-  //           nodeEndpoint: rumor.EndPoint,
-  //           neighbors: [],
-  //           uuid: rumor.Rumor.messageID.split(":")[0]
-  //         });
-  //         console.log("Saving user")
-  //         console.log(newUser)
-  //         resultPromise = UserController.saveUser(newUser);
-  //       } else {
-  //         console.log("There is a user")
-  //         resultPromise = UserController.createRumorFromRumor(userId, rumor);
-  //       }
-  //       resultPromise
-  //       .then(resolve)
-  //       .catch(reject)
-  //     });
-  //   });
-  // }
+   public static resolveRumor(userId, rumor) {
+     return Q.Promise((resolve, reject) => {
+     let resultPromise = null;
+       console.log("Resolving rumor")
+       console.log(rumor.EndPoint)
+       User.findOne({nodeEndpoint: rumor.EndPoint}, (err, user) => {
+         if (err) {
+           console.log(err)
+           return reject({status: 500, message: err});
+         }
+         if (!user) {
+           console.log("There is no user, creating new User...")
+           let newUser = new User({
+             name: rumor.Rumor.Originator,
+             username: rumor.Rumor.Originator,
+             seed: true,
+             rumors: [rumor],
+             nodeEndpoint: rumor.EndPoint,
+             neighbors: [],
+             uuid: rumor.Rumor.messageID.split(":")[0]
+           });
+           console.log("Saving user")
+           console.log(newUser)
+           resultPromise = UserController.saveUser(newUser);
+         } else {
+           console.log("There is a user")
+           resultPromise = UserController.createRumorFromRumor(userId, rumor);
+         }
+         resultPromise
+         .then(resolve)
+         .catch(reject)
+       });
+     });
+   }
 
   // public static createRumorReq(req, res) {
   //   //if the message coming in is a rumor do something
