@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import { UserFollower, IUserFollower } from './user-follower.model';
+import {UserFollowerOperations} from './user-follower.operations'
 
 export class UserFollowerCtrl {
  
