@@ -166,7 +166,7 @@ export class UserController {
   //       resultPromise = UserController.resolveRumorWithNoUser(rumor)
   //     } else {
   //       console.log("User exists, update user with new rumor")
-  //       resultPromise = UserController.resolveSuggestion(userId, rumor)
+  //       resultPromise = UserController.resolveSuggestion(userId, suggestion)
   //     }
   //   } else if (want) {
   //     console.log(want)
