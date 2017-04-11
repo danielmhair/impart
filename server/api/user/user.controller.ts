@@ -4,7 +4,7 @@ import { User, IUser } from './user.model';
 import { ServerSettings } from '../../config/ServerSettings';
 import * as jwt from 'jsonwebtoken';
 import * as uuid from 'node-uuid';
-import * as Q from 'q'
+import * as Q from 'q';
 import { Utils } from '../../utils';
 import {HttpRequest} from "../http-request";
 // import { Suggestion } from "../../models/Suggestion"
@@ -68,11 +68,11 @@ export class UserController {
   // };
 
    public static createSuggestionFromSuggestion(userId, suggestion) {
-     return Q.Promise((resolve, reject) => {
+     return Q.Promise ((resolve, reject) => {
        console.log("CREATING SUGGESTION FROM SUGGESTION");
        console.log("THIS USER IS LOOKING AT A SUGGESTION: " + userId + ": ");
        console.log(suggestion);
-       User.findById(userId, (err, user) => {
+       User.findById(userId, async (err, user) => {
           if (err) {
             console.error(err)
             return reject({status: 500, message: err});
@@ -81,7 +81,7 @@ export class UserController {
           const activities: IActivity[] = await UserFollowerOperations.getUsersActivites(userId);
           
           //check if there is already a relation between the user and this activity.
-          let exists = activities.filter(activity => {
+          let exists = activities.filter((activity: IActivity) => {
             return activity._id == suggestion.activity._id
             }).length > 0
 
@@ -102,7 +102,9 @@ export class UserController {
             //create the connection between user and activity
             ActivityUserOperations.create(activityUser)
             .then((document: IUserFollower) => resolve(document))
-            .catch(err => UserFollowerCtrl.handleError(res, err))
+            .catch((err) => {
+              return reject({status: 500, err: err});
+            })
           } else {
             console.log("SUGGESTION THROWN OUT BECAUSE IT ALREADY EXISTS OR DOESN'T MATCH ANY CATEGORIES")
             return resolve(suggestion)
@@ -138,7 +140,7 @@ export class UserController {
           const activityUser : IActivityUser = {
             activityId: createdActivity._id,
             userId: userId,
-            isRecommendation: False,
+            isRecommendation: false,
           }
           ActivityUserOperations.create(activityUser)
           .then((createdActivityUser: IActivityUser)  => {
