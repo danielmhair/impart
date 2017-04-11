@@ -80,21 +80,27 @@ export class UserController {
           if (!user) return reject({status: 404, message: "Unable to get user with id: " + userId + "to create acivity-user"})
           const activities: IActivity[] = await UserFollowerOperations.getUsersActivites(userId);
           
-          //check if the categories in the suggestion match this users suggestions
+          //check if there is already a relation between the user and this activity.
           let exists = activities.filter(activity => {
-            return activity._id == suggestion._id
+            return activity._id == suggestion.activity._id
             }).length > 0
 
           //make sure one or more of the categories also match.
           let matches = user.categories.filter((eaCategory) => {
-            suggestion.categories.indexOf(eaCategory) >= 0
+            suggestion.activity.categories.indexOf(eaCategory) >= 0
             }).length > 0;
+
           console.log("Exists? " + exists)
           console.log("Matches? " + matches)
           // if the user is not already associated with the activity, and the activity matches one or more of his categories
           if (!exists && matches) {
-            suggestion.userId = userId
-            UserFollowerOperations.create(suggestion)
+            const activityUser: IActivityUser = {
+              activityId: suggestion.activity._id,
+              userId: userId,
+              isRecommendation: false
+            } 
+            //create the connection between user and activity
+            ActivityUserOperations.create(activityUser)
             .then((document: IUserFollower) => resolve(document))
             .catch(err => UserFollowerCtrl.handleError(res, err))
           } else {
@@ -126,23 +132,22 @@ export class UserController {
         }
         //create the activity in the database
         ActivityOperations.create(activity)
-        .then((results) => {
-          console.log(results);
+        .then((createdActivity: IActivity) => {
+          console.log(createdActivity);
           //using the resulting document create the activity-user connection
           const activityUser : IActivityUser = {
-            activityId: results._id,
+            activityId: createdActivity._id,
             userId: userId,
             isRecommendation: False,
           }
           ActivityUserOperations.create(activityUser)
-          .then((results) => {
-            console.log(results);
-            return resolve(results);
+          .then((createdActivityUser: IActivityUser)  => {
+            console.log(createdActivityUser);
+            return resolve(createdActivityUser);
           })
           .catch((err) => {
             return reject({status: 500, err: err});
           })
-          return resolve(results);
         })
         .catch((err) => {
           return reject({status: 500, err: err});
