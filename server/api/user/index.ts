@@ -11,8 +11,7 @@ UserApi.get('/:username', UserController.show);
 //UserApi.put('/:id/password', UserController.changePassword);
 //UserApi.get('/:id/suggestions', UserController.getSuggestions);
 UserApi.get('/me', UserController.me);
-
-//UserApi.post('/:id/rumors', UserController.createRumorReq);
+UserApi.post('/:id/suggestions', UserController.createRumorReq);
 UserApi.post('/', UserController.create);
 UserApi.delete('/:id', UserController.destroy);
 
