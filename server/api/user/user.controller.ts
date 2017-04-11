@@ -95,7 +95,7 @@ export class UserController {
           if (!exists && matches) {
             suggestion.userId = userId
             UserFollowerOperations.create(suggestion)
-            .then((document: IUserFollower) => res.status(201).json(document))
+            .then((document: IUserFollower) => resolve(document))
             .catch(err => UserFollowerCtrl.handleError(res, err))
           } else {
             console.log("SUGGESTION THROWN OUT BECAUSE IT ALREADY EXISTS OR DOESN'T MATCH ANY CATEGORIES")
@@ -105,39 +105,57 @@ export class UserController {
      });
    };
 
-  // public static createRumorFromMessage(userId, message) {
-  //   return Q.Promise((resolve, reject) => {
-  //     User.findById(userId, (err, user) => {
-  //       if (err) return reject({status: 500, message: err});
-  //       if (!user) return reject({status: 404, message: "Unable to get user"});
-  //       // const suggest = new Suggestion("user", {}, "string");
-  //       // const want = new Want(...);
-  //       let text = message;
-  //       let originator = user.username;
-  //       let maxSequenceNum = UserController.maxSequenceNumber(user.rumors, user.uuid);
-  //       let messageId = user.uuid + ":" + (maxSequenceNum + 1);
-  //       let rumor = {
-  //         Rumor: {
-  //           messageID: messageId,
-  //           Originator: originator,
-  //           Text: text
-  //         },
-  //         EndPoint: user.nodeEndpoint
-  //       };
-  //       user.rumors.push(rumor);
-  //       user.save((err) => {
-  //         if (err) return reject({status: 500, message: err});
-  //         return resolve(rumor)
-  //       });
-  //     });
-  //   })
-  // };
+  public static createSuggestionFromMessage(userId, body) {
+     return Q.Promise((resolve, reject) => {
+       User.findById(userId, (err, user) => {
+        if (err) return reject({status: 500, message: err});
+        if (!user) return reject({status: 404, message: "Unable to get user"});
+          //const suggest = new Suggestion("user", {}, "string");
+          //const want = new Want(...);
+        let name = body.name;
+        let description = body.description;
+        let address = body.address;
+        let categories = body.categories;
+        let event = body.event;
+        const activity : IActivity = {
+          name: body.name,
+          description: body.messageId,
+          address: body.originator,
+          categories: body.categories,
+          event : body.event
+        }
+        //create the activity in the database
+        ActivityOperations.create(activity)
+        .then((results) => {
+          console.log(results);
+          //using the resulting document create the activity-user connection
+          const activityUser : IActivityUser = {
+            activityId: results._id,
+            userId: userId,
+            isRecommendation: False,
+          }
+          ActivityUserOperations.create(activityUser)
+          .then((results) => {
+            console.log(results);
+            return resolve(results);
+          })
+          .catch((err) => {
+            return reject({status: 500, err: err});
+          })
+          return resolve(results);
+        })
+        .catch((err) => {
+          return reject({status: 500, err: err});
+        })
+      });
+    })
+  };
 
-   public static resolveSuggestion(userId, suggestion) {
+  public static resolveSuggestion(userId, suggestion) {
     return Q.Promise((resolve, reject) => {
       let resultPromise = null;
       console.log("Resolving Suggestion")
-     User.findById(userId, (err, user)  => {
+      User.findById(userId, (err, user)  => {
         if (err) {
           console.log(err)
           return reject({status: 500, message: err});
@@ -149,8 +167,13 @@ export class UserController {
           resultPromise = UserController.createSuggestionFromSuggestion(userId, suggestion);
         }
         resultPromise
-        .then(resolve)
-        .catch(reject)
+        .then((results) => {
+          console.log(results);
+          return resolve(results);
+        })
+        .catch((err) => {
+          return reject({status: 500, err: err});
+        })
       });
     });
   }
@@ -178,8 +201,8 @@ export class UserController {
       //resultPromise = UserController.resolveWant(userId, want);
     } else {
       console.log("Creating rumor from a message from the client");
-      //console.log(req.body.message);
-      //resultPromise = UserController.createRumorFromMessage(userId, req.body.message);
+      console.log(req.body.message);
+      resultPromise = UserController.createSuggestionFromMessage(userId, req.body);
     }
 
     resultPromise
