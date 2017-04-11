@@ -9,7 +9,6 @@ export interface IUser extends Document {
   email: String,
   phone: Number,
   categories: string[],
-  suggestions: string[],
   username: string,
   role: string,
   nodeEndpoint: string,
@@ -29,7 +28,6 @@ let UserSchema: Schema = new Schema({
   email: String,
   phone: Number,
   categories: [],
-  suggestions: [],
   username: String,
   role: {
     type: String,

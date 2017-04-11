@@ -7,8 +7,8 @@ import * as uuid from 'node-uuid';
 import * as Q from 'q';
 import { Utils } from '../../utils';
 import {HttpRequest} from "../http-request";
-// import { Suggestion } from "../../models/Suggestion"
-// import { Want } from "../../models/Want"
+import { Suggestion } from "../../models/Suggestion"
+import { Want } from "../../models/Want"
 import { UserOperations } from "../user/user.operations"
 
 import { Activity, IActivity } from '../activity/activity.model';
@@ -40,32 +40,46 @@ export class UserController {
   //   });
   // };
 
-  // public static resolveWant(userId, want) {
-  //   return Q.Promise((resolve, reject) => {
-  //     User.findById(userId, (err, userWithWant: IUser) => {
-  //       if (err) return reject({status: 500, message: err});
-  //       if (!userWithWant) return reject({status: 404, message: "Unable to get user"});
-  //       User.find({nodeEndpoint: want.EndPoint}, (err, userWithSuggestions: IUser) => {
-  //         if (err) return reject(err)
-  //         if (!userWithRumor) return reject({status: 200, data: "User is not found"})
-  //         if (!userWithRumor.rumors) userWithRumor.rumors = []
-  //         let rumorsToAdd = userWithRumor.rumors
-  //         .filter((rumor) => {
-  //           let uuids = Object.keys(want.Want);
-  //           let messageIdParts = rumor.Rumor.messageID.split(":");
-  //           let rumorUuid = messageIdParts[0];
-  //           let rumorSequence = messageIdParts[1];
-  //           return rumorSequence > want.Want[rumorUuid];
-  //         });
-  //         userWithWant.rumors = userWithWant.rumors.concat(rumorsToAdd);
-  //         userWithWant.save((err) => {
-  //           if (err) return reject(err);
-  //           return resolve(rumorsToAdd)
-  //         })
-  //       })
-  //     });
-  //   });
-  // };
+  /** resolveWant
+   * Check the categories in the want and compare it to all the user's activities
+   * send a random one that matches
+   * Look at Andrew's matches
+   */
+  public static resolveWant(userId, want) {
+
+    return Q.Promise((resolve, reject) => {
+
+      User.findById(userId, (err, userWithWant: IUser) => {
+
+        if (err) return reject({status: 500, message: err});
+        if (!userWithWant) return reject({status: 404, message: "Unable to get user"});
+
+        User.find({nodeEndpoint: want.EndPoint}, (err, userWithActivities: IUser) => {
+
+          if (err) return reject(err);
+          if (!userWithActivities) return reject({status: 200, data: "User is not found"});
+          //if (!userWithActivities.rumors) userWithActivities.rumors = [];
+          //activities: IActivity[] = UserOperations.getCa
+          // let rumorsToAdd = userWithActivities.rumors
+          // .filter((rumor) => {
+          //   let uuids = Object.keys(want.Want);
+          //   let messageIdParts = rumor.Rumor.messageID.split(":");
+          //   let rumorUuid = messageIdParts[0];
+          //   let rumorSequence = messageIdParts[1];
+          //   return rumorSequence > want.Want[rumorUuid];
+          // });
+          // userWithWant.rumors = userWithWant.rumors.concat(rumorsToAdd);
+          // userWithWant.save((err) => {
+          //   if (err) return reject(err);
+          //   return resolve(rumorsToAdd)
+          // })
+        });
+
+      });
+
+    });
+
+  };
 
    public static createSuggestionFromSuggestion(userId, suggestion) {
      return Q.Promise ((resolve, reject) => {
@@ -481,11 +495,13 @@ export class UserController {
   public static suggestActivitiesToOtherUsers = async () => {
     const users: IUser[] = await UserOperations.getAll();
     users.forEach( async (user) => {
+
       // Get the current user's followers
       const followers: IUser[] = await UserFollowerOperations.getUsersFollowers(user._id);
 
       // Get all of the activities for the current user
       const activities: IActivity[] = await UserFollowerOperations.getUsersActivites(user._id);
+
       console.log("============");
       console.log("users");
       console.log(users);
@@ -522,6 +538,9 @@ export class UserController {
         // Randomly pick to send a suggestion or a want
         if (Utils.getRandom(0, 2) == 0) {
 
+          // // Prepare a suggestion from the users activities
+          // let randomSuggestion = activities[Utils.getRandom(0, activities.length)];
+
           // Prepare a suggestion from the users activities
           // TODO Make sure this suggestion matches one of the user's categories
           // Maybe like this?
@@ -542,7 +561,7 @@ export class UserController {
           .catch((err) => console.error(err));
         } else {
           // Prepare a want
-          const Want = UserController.prepareWant(user);
+          const want = new Want(user.categories, user.nodeEndpoint); 
           // UserController.resolveWant(randomNeighborId, Want)
           console.log("Sending random want to...");
           console.log(follower);
@@ -555,22 +574,22 @@ export class UserController {
     });
   };
 
-  public static prepareWant(user) {
-    let Want = {
-      "Want": {},
-      "EndPoint": user.nodeEndpoint
-    };
+  // public static prepareWant(user) {
+  //   let Want = {
+  //     "Categories": user.categories,
+  //     "EndPoint": user.nodeEndpoint
+  //   };
 
-    Utils.uniqueItems(
-      user.rumors.map((rumor) => {
-        return parseInt(rumor.Rumor.messageID.split(":")[0])
-      })
-    ).forEach((uuid) => {
-      Want.Want[uuid] = UserController.maxSequenceNumber(user.rumors, uuid);
-    });
+  //   Utils.uniqueItems(
+  //     user.rumors.map((rumor) => {
+  //       return parseInt(rumor.Rumor.messageID.split(":")[0])
+  //     })
+  //   ).forEach((uuid) => {
+  //     Want.Want[uuid] = UserController.maxSequenceNumber(user.rumors, uuid);
+  //   });
 
-    return Want;
-  }
+  //   return Want;
+  // }
 
   public static saveUser(user) {
     return Q.Promise((resolve, reject) => {
@@ -584,18 +603,18 @@ export class UserController {
     });
   }
 
-  public static maxSequenceNumber(rumors, uuid) {
-    return rumors
-    .filter((rumor) => {
-      return rumor.Rumor.messageID.split(":")[0] === uuid
-    })
-    .map((rumor) => {
-      return parseInt(rumor.Rumor.messageID.split(":")[1])
-    })
-    .reduce((a, b) => {
-      return Math.max(a, b);
-    }, [])
-  }
+  // public static maxSequenceNumber(rumors, uuid) {
+  //   return rumors
+  //   .filter((rumor) => {
+  //     return rumor.Rumor.messageID.split(":")[0] === uuid
+  //   })
+  //   .map((rumor) => {
+  //     return parseInt(rumor.Rumor.messageID.split(":")[1])
+  //   })
+  //   .reduce((a, b) => {
+  //     return Math.max(a, b);
+  //   }, [])
+  // }
 
 
   public static httpPost(url, body) {
