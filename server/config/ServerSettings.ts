@@ -12,7 +12,7 @@ export class ServerSettings {
   public static ip: '127.0.0.1';
   // public static ip: '0.0.0.0';
 
-  public static root = path.normalize(__dirname + '/../../..');
+  public static root = path.normalize(__dirname + '/../..');
   public static appUrl: string = "http://localhost:4200";
   public static tokenAgeInMinutes = 60*5;
 

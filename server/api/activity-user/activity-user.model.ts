@@ -8,9 +8,9 @@ export interface IActivityUser extends BaseDocument {
 }
 
 export class ActivityUser extends BaseDocument {
-  activityId: string;
-  userId: string;
-  isRecommendation: boolean;
+  public activityId: string;
+  public userId: string;
+  public isRecommendation: boolean;
 
   constructor(activityId: string, userId: string, isRecommendation: boolean, id?: string) {
     super(id);

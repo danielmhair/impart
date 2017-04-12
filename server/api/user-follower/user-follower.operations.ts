@@ -1,5 +1,5 @@
 import {ApiCtrl} from "../ApiCtrl";
-import {IUserFollowerModel, UserFollower, IUserFollower} from './user-follower.model';
+import {IUserFollowerModel, UserFollower, IUserFollower, UserFollowerModel} from './user-follower.model';
 import {IActivity, IActivityModel} from "../activity/activity.model";
 import {IActivityUser, IActivityUserModel, ActivityUser} from "../activity-user/activity-user.model";
 import {ActivityOperations} from "../activity/activity.operations";
@@ -9,7 +9,7 @@ import {IUser, IUserModel} from "../user/user.model";
 
 class UserFollowerOp extends ApiCtrl<IUserFollowerModel, UserFollower> {
   constructor() {
-    super(UserFollower)
+    super(UserFollowerModel)
   }
 
   public getUsersActivites(userId: string): Q.Promise<IActivity[]> {
@@ -35,8 +35,8 @@ class UserFollowerOp extends ApiCtrl<IUserFollowerModel, UserFollower> {
   }
 
   private getActivitiesBy(params: Object): Q.Promise<IActivity[]> {
-    return this.getBy(params)
-    .then((activityUsers: IActivityUserModel[]) => {
+    return super.getBy(params)
+    .then((activityUsers: IUserFollowerModel[]) => {
       return ActivityOperations.getBy({userId: {$in: activityUsers.map(item => item.userId)}})
       .then((activities: IActivityModel[]) => {
         return activities
