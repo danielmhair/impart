@@ -84,7 +84,7 @@ export class UserController {
        UserOperations.getById(userId)
        .then(async (user: IUserModel) => {
           if (!user) return reject({status: 404, message: "Unable to get user with id: " + userId + "to create acivity-user"})
-          const activities: IActivity[] = await ActivityUserOperations.getActivitiesBy({userId: userId, isRecommendation: false});
+          const activities: IActivity[] = await ActivityUserOperations.getUsersActivites({userId: userId, isRecommendation: false});
           console.log(activities)
           //check if there is already a relation between the user and this activity.
           let exists = activities.filter((activity: IActivity) => {
@@ -325,7 +325,7 @@ export class UserController {
       const followers: IUserModel[] = await UserFollowerOperations.getUsersFollowers(user._id);
 
       // Get all of the activities for the current user
-      const activities: IActivity[] = await ActivityUserOperations.getUsersActivites(user._id);
+      const activities: IActivity[] = await ActivityUserOperations.getUsersActivites({userId: userId, isRecommendation: false});
 
       console.log("============");
       console.log("users");

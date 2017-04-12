@@ -12,11 +12,6 @@ class UserFollowerOp extends ApiCtrl<IUserFollowerModel, UserFollower> {
   constructor() {
     super(UserFollowerModel)
   }
-
-  public getUsersActivites(userId: string): Q.Promise<IActivity[]> {
-    return ActivityUserOperations.getActivitiesBy({userId: userId, isRecommendation: false});
-  }
-
   public getUsersFollowers(userId: string): Q.Promise<IUserModel[]> {
     return this.getUsersBy({ userId: userId })
   }

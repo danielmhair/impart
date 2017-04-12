@@ -8,7 +8,7 @@ class ActivityUserOp extends ApiCtrl<IActivityUserModel, ActivityUser> {
     super(ActivityUserModel)
   }
 
-   public getActivitiesBy(params: Object): Q.Promise<IActivity[]> {
+   public getUsersActivities(params: Object): Q.Promise<IActivity[]> {
     return super.getBy(params)
     .then((activityUsers: IActivityUserModel[]) => {
       console.log("THIS PART WORKED: " + activityUsers)
