@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import {UserFollowerOperations} from './user-follower.operations'
-import { UserFollowerModel, IUserFollower, UserFollower } from './user-follower.model';
+import { IUserFollowerModel, UserFollowerModel, IUserFollower, UserFollower } from './user-follower.model';
 
 
 export class UserFollowerCtrl {
@@ -17,7 +17,7 @@ export class UserFollowerCtrl {
     if (req.body.followerId != null) return res.status(404).send('Bad Request: Need followerId')
      const relation : IUserFollower = new UserFollower(req.body.followerId,req.params.id);
      UserFollowerOperations.create(relation)
-     .then((document: IUserFollower) => res.status(201).json(document))
+     .then((document: IUserFollowerModel) => res.status(201).json(document))
      .catch(err => UserFollowerCtrl.handleError(res, err))
   }
 
@@ -26,7 +26,7 @@ export class UserFollowerCtrl {
     if(req.body._id) { delete req.body._id; }
     const relation : IUserFollower = new UserFollower(req.body.followerId,req.params.id)
      UserFollowerOperations.update(relation)
-     .then((document: IUserFollower) => res.status(200).json(document))
+     .then((document: IUserFollowerModel) => res.status(200).json(document))
      .catch(err => UserFollowerCtrl.handleError(res, err))
   }
 
