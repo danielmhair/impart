@@ -5,7 +5,7 @@ export class UserFollower extends BaseDocument {
   followerId: string;
   userId: string;
 
-  constructor(id: string, followerId: string, userId: string) {
+  constructor(followerId: string, userId: string, id?: string) {
     super(id);
     this.followerId = followerId;
     this.userId = userId;

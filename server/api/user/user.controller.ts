@@ -129,7 +129,7 @@ export class UserController {
         let address = body.address;
         let categories = body.categories;
         let event = body.event;
-        const activity : Activity = new Activity(body.name, body.messageId, body.originator,
+        const activity : Activity = new Activity(body.name, body.description, body.address,
                                                   body.categories, body.event);
         //create the activity in the database
         ActivityOperations.create(activity)

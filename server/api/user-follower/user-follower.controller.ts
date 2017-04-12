@@ -15,7 +15,7 @@ export class UserFollowerCtrl {
   // Creates a new state in the DB.
   public static create(req, res) {
     if (req.body.followerId != null) return res.status(404).send('Bad Request: Need followerId')
-     const relation : IUserFollower = {followerId : req.body.followerId, userId : req.params.id};
+     const relation : IUserFollower = new UserFollower(req.body.followerId,req.params.id);
      UserFollowerOperations.create(relation)
      .then((document: IUserFollower) => res.status(201).json(document))
      .catch(err => UserFollowerCtrl.handleError(res, err))
