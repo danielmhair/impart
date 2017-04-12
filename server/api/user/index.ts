@@ -12,7 +12,6 @@ UserApi.get('/:username', UserController.show);
 //UserApi.get('/:id/suggestions', UserController.getSuggestions);
 UserApi.get('/me', UserController.me);
 UserApi.post('/:id/suggestions', UserController.createRumorReq);
-UserApi.post('/', UserController.create);
 UserApi.delete('/:id', UserController.destroy);
 
 setInterval(() => {

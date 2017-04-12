@@ -14,7 +14,7 @@ export class UserFollowerCtrl {
   // Creates a new state in the DB.
   public static create(req, res) {
     if (req.body.followerId != null) return res.status(404).send('Bad Request: Need followerId')
-     let relation ={"followerId": req.body.followerId, "userId": req.params.id}
+     const relation : IUserFollower = {followerId : req.body.followerId, userId : req.params.id};
      UserFollowerOperations.create(relation)
      .then((document: IUserFollower) => res.status(201).json(document))
      .catch(err => UserFollowerCtrl.handleError(res, err))
@@ -23,15 +23,10 @@ export class UserFollowerCtrl {
   // Updates an existing state in the DB.
   public static update(req, res) {
     if(req.body._id) { delete req.body._id; }
-    UserFollower.findById(req.params.id, function (err, document: IUserFollower) {
-      if (err) { return UserFollowerCtrl.handleError(res, err); }
-      if(!document) { return res.status(404).send('Not Found'); }
-      var updated = _.merge(document, req.body);
-      updated.save(function (err) {
-        if (err) { return UserFollowerCtrl.handleError(res, err); }
-        return res.status(200).json(document);
-      });
-    });
+    const relation : IUserFollower = {followerId : req.body.followerId, userId : req.params.id}
+     UserFollowerOperations.update(relation)
+     .then((document: IUserFollower) => res.status(200).json(document))
+     .catch(err => UserFollowerCtrl.handleError(res, err))
   }
 
   // Deletes a state from the DB.

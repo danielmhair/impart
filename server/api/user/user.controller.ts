@@ -225,7 +225,6 @@ export class UserController {
       console.log(req.body.message);
       resultPromise = UserController.createSuggestionFromMessage(userId, req.body);
     }
-
     resultPromise
     .then((result) => {
       res.status(200).json(result)
