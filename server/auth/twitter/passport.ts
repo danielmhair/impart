@@ -39,7 +39,6 @@ class TwitterPassportSetup {
               if (err) return done(err);
               done(err, user);
             });
-          }
           } else {
             user.twitter = profile._json;
             if (user._id && !user.nodeEndpoint) {
