@@ -84,8 +84,8 @@ export class UserController {
        UserOperations.getById(userId)
        .then(async (user: IUserModel) => {
           if (!user) return reject({status: 404, message: "Unable to get user with id: " + userId + "to create acivity-user"})
-          const activities: IActivity[] = await UserFollowerOperations.getUsersActivites(userId);
-          
+          const activities: IActivity[] = await ActivityUserOperations.getActivitiesBy({userId: userId, isRecommendation: false});
+          console.log(activities)
           //check if there is already a relation between the user and this activity.
           let exists = activities.filter((activity: IActivity) => {
             return activity._id == suggestion.activity._id
@@ -102,6 +102,7 @@ export class UserController {
           if (!exists && matches) {
             const activityUser: IActivityUser = new ActivityUser(suggestion.activity._id, userId, false);
             //create the connection between user and activity
+            activityUser._id = "222222222222222222222222"
             ActivityUserOperations.create(activityUser)
             .then((document: IActivityUserModel) => resolve(document))
             .catch((err) => reject({status: 500, err: err}));
@@ -131,18 +132,22 @@ export class UserController {
         let event = body.event;
         const activity : Activity = new Activity(body.name, body.description, body.address,
                                                   body.categories, body.event);
+        activity._id = "111111111111111111111111"
+        console.log(activity);
         //create the activity in the database
         ActivityOperations.create(activity)
         .then((createdActivity: IActivity) => {
           console.log(createdActivity);
           //using the resulting document create the activity-user connection
           const activityUser: IActivityUser = new ActivityUser(createdActivity._id, userId, false);
+          activityUser._id = "111111111111111111111111"
           ActivityUserOperations.create(activityUser)
           .then((createdActivityUser: IActivityUserModel)  => {
             console.log(createdActivityUser);
             return resolve(createdActivityUser);
           })
           .catch((err) => {
+            console.log(err)
             return reject({status: 500, err: err});
           })
         })
@@ -218,56 +223,36 @@ export class UserController {
   /**
     * Creates a new user
     */
-   public static create(req, res, next) {
-     console.log("create");
-     let originator = req.body.originator;
-     let endpoint = req.body.endpoint;
-     let newUser = null;
-     if (originator && endpoint) {
-        newUser = new User(endpoint, originator, originator, 'user')
-     } else {
-       newUser = req.body;
-       //newUser.nodeEndpoint = "https://www.danielmhair.com/api/users/" + newUser._id + "/rumors";
-       newUser.nodeEndpoint = "https://www.danielmhair.com/api/users/" + newUser._id + "/suggestions";
-       newUser.role = 'user';
-       newUser.provider = 'local';
-     }
-     newUser.uuid = uuid.v4();
-     if (newUser.provider === "anonymous") {
-       UserModel.find({username: originator, provider: "anonymous"}, (err, users) => {
-         if (!err && users && users.length > 0) {
-           console.log("Found node endpoint with username. Don't need to add user.")
-           console.log(users);
-           let token = jwt.sign({_id: users[0]._id}, ServerSettings.secrets.session, {expiresIn: 60 * 5});
-           return res.status(200).json({token: token});
-         } else {
-           // UserController.addNeighborAndSave(newUser)
-           // .then((results) => {
-           //   console.log("Neighbors added...")
-           //   console.log(results);
-           //   let token = jwt.sign({_id: newUser._id}, ServerSettings.secrets.session, {expiresIn: 60 * 5});
-           //   console.log(token);
-           //   return res.status(200).json({token: token});
-           //  })
-           // .catch((errResult) => {
-           //   return res.status(errResult.status).json(errResult.err);
-           // })
-         }
-       })
-     } else {
-       // UserController.addNeighborAndSave(newUser)
-       // .then((results) => {
-       //   console.log("Neighbors added...")
-       //   console.log(results);
-       //   let token = jwt.sign({_id: newUser._id}, ServerSettings.secrets.session, {expiresIn: 60 * 5});
-       //   console.log(token);
-       //   return res.status(200).json({token: token});
-       //  })
-       // .catch((errResult) => {
-       //   return res.status(errResult.status).json(errResult.err);
-       // })
-     }
-   };
+  public static create(req, res, next) {
+    console.log("create");
+    let originator = req.body.originator;
+    let endpoint = req.body.endpoint;
+    console.log(originator)
+    console.log(endpoint)
+    let newUser = null;
+    if (originator && endpoint) {
+      newUser = new User(endpoint, originator, originator, 'user')
+    }
+    newUser.uuid = uuid.v4();
+    newUser.nodeEndpoint = "https://www.localhost:3008/api/users/" + newUser.uuid + "/suggestions";
+    newUser.role = 'user';
+    newUser.provider = 'local';
+
+    console.log(newUser)
+    UserOperations.create(newUser)
+    .then((createdUser: IUserModel) => {
+      console.log("New user added")
+      console.log(createdUser);
+      let token = jwt.sign({_id: createdUser._id}, ServerSettings.secrets.session, {expiresIn: 60 * 5});
+      console.log(token);
+      return res.status(200).json({token: token});
+    })
+    .catch((errResult) => {
+      console.log("probably right here")
+      console.log(errResult);
+      return res.status(errResult.status).json(errResult.err);
+    })
+  };
  
   /**
    * Get a single user

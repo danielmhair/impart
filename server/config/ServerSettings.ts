@@ -2,15 +2,15 @@
 
 import * as path from 'path';
 
-const domain = "https://www.danielmhair.com:3008";
-// const domain = "http://localhost:3008";
+//const domain = "https://www.danielmhair.com:3008";
+const domain = "http://localhost:3008";
 export class ServerSettings {
   // Server port
   public static httpsPort: 3008;
   public static httpPort: 3008;
   // Server IP
-  public static ip: '127.0.0.1';
-  // public static ip: '0.0.0.0';
+  //public static ip: '127.0.0.1';
+  public static ip: '0.0.0.0';
 
   public static root = path.normalize(__dirname + '/../..');
   public static appUrl: string = "http://localhost:4200";
