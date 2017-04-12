@@ -102,7 +102,6 @@ export class UserController {
           if (!exists && matches) {
             const activityUser: IActivityUser = new ActivityUser(suggestion.activity._id, userId, false);
             //create the connection between user and activity
-            activityUser._id = "222222222222222222222222"
             ActivityUserOperations.create(activityUser)
             .then((document: IActivityUserModel) => resolve(document))
             .catch((err) => reject({status: 500, err: err}));
@@ -132,7 +131,6 @@ export class UserController {
         let event = body.event;
         const activity : Activity = new Activity(body.name, body.description, body.address,
                                                   body.categories, body.event);
-        activity._id = "111111111111111111111111"
         console.log(activity);
         //create the activity in the database
         ActivityOperations.create(activity)
@@ -140,7 +138,6 @@ export class UserController {
           console.log(createdActivity);
           //using the resulting document create the activity-user connection
           const activityUser: IActivityUser = new ActivityUser(createdActivity._id, userId, false);
-          activityUser._id = "111111111111111111111111"
           ActivityUserOperations.create(activityUser)
           .then((createdActivityUser: IActivityUserModel)  => {
             console.log(createdActivityUser);
@@ -328,7 +325,7 @@ export class UserController {
       const followers: IUserModel[] = await UserFollowerOperations.getUsersFollowers(user._id);
 
       // Get all of the activities for the current user
-      const activities: IActivity[] = await UserFollowerOperations.getUsersActivites(user._id);
+      const activities: IActivity[] = await ActivityUserOperations.getUsersActivites(user._id);
 
       console.log("============");
       console.log("users");
