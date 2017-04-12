@@ -1,9 +1,28 @@
 import { Schema, model, Document } from 'mongoose';
+import {BaseDocument} from "../../models/BaseDocument";
 
-export interface IUserFollower extends Document {
+export class UserFollower extends BaseDocument {
+  followerId: string;
+  userId: string;
+
+  constructor(id: string, followerId: string, userId: string) {
+    super(id);
+    this.followerId = followerId;
+    this.userId = userId;
+  }
+}
+
+export interface IUserFollower extends BaseDocument {
   followerId: string;
   userId: string;
 }
+
+export interface IUserFollowerModel extends UserFollower, Document {
+  _id: string;
+  followerId: string;
+  userId: string;
+}
+
 
 let UserFollowerSchema = new Schema({
   // _id is already included
@@ -11,17 +30,4 @@ let UserFollowerSchema = new Schema({
   userId: String
 }, { collection: 'UserFollowerSchema' });
 
-// To get people following you, search by { userId: userId }
-// To get people your following, search by { followerId: userId }
-//   userId   followerId
-//     1           2
-//     1           5
-//     1           6
-//     1           7
-//     2           4
-//     2           5
-//     2           6
-//     2           7
-
-
-export const UserFollower = model('UserFollowerSchema', UserFollowerSchema);
+export const UserFollowerModel = model('UserFollowerSchema', UserFollowerSchema);

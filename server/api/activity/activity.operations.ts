@@ -1,7 +1,7 @@
-import { Activity, IActivity } from './activity.model';
+import { Activity, IActivityModel } from './activity.model';
 import {ApiCtrl} from "../ApiCtrl";
 
-class ActivityOp extends ApiCtrl<IActivity> {
+class ActivityOp extends ApiCtrl<IActivityModel, Activity> {
   constructor() {
     super(Activity)
   }

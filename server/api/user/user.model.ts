@@ -2,9 +2,58 @@
 
 import { Schema, model, Document } from 'mongoose';
 import { pbkdf2Sync, randomBytes } from 'crypto';
+import {BaseDocument} from "../../models/BaseDocument";
 const authTypes = ['github', 'twitter', 'facebook', 'google', 'foursquare', 'anonymous'];
 
-export interface IUser extends Document {
+export class User implements IUser {
+  _id: string;
+  name: String;
+  email: String;
+  phone: Number;
+  categories: string[];
+  username: string;
+  role: string;
+  nodeEndpoint: string;
+  uuid: string;
+  hashedPassword: string;
+  provider: string;
+  salt: string;
+  facebook: Object;
+  twitter: Object;
+  google: Object;
+  foursquare: Object;
+  authenticate: Function;
+
+  constructor(nodeEndpoint: string, username: string, name: string, role: string, id?: string) {
+    this._id = id;
+    this.name = name;
+    this.username = username;
+    this.nodeEndpoint = nodeEndpoint;
+    this.role = role;
+  }
+}
+
+export interface IUserModel extends Document, User {
+  _id: string
+  name: String,
+  email: String,
+  phone: Number,
+  categories: string[],
+  username: string,
+  role: string,
+  nodeEndpoint: string,
+  uuid: string,
+  hashedPassword: string,
+  provider: string,
+  salt: string,
+  facebook: Object;
+  twitter: Object;
+  google: Object;
+  foursquare: Object;
+  authenticate: Function;
+}
+
+export interface IUser extends BaseDocument {
   name: String,
   email: String,
   phone: Number,
@@ -162,5 +211,4 @@ UserSchema.methods = {
   }
 };
 
-//export const User = model<IUser>('User', UserSchema);
-export const User = model<IUser>('UserSchema', UserSchema);
+export const UserModel = model<IUserModel>('UserSchema', UserSchema);

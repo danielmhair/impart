@@ -1,10 +1,10 @@
 import * as _ from 'lodash';
-import { UserFollower, IUserFollower } from './user-follower.model';
+import { UserFollowerModel, IUserFollower } from './user-follower.model';
 
 export class UserFollowerCtrl {
   // Get list of clients
   public static index(req, res) {
-    UserFollower.find({}, function(err, documents: IUserFollower[]) {
+    UserFollowerModel.find({}, function(err, documents: IUserFollower[]) {
       if(err) { return UserFollowerCtrl.handleError(res, err); }
       return res.status(200).json(documents);
     });
@@ -13,7 +13,7 @@ export class UserFollowerCtrl {
   // Creates a new state in the DB.
   public static create(req, res) {
     if (req.body._id == null) delete req.body._id;
-    UserFollower.create(req.body, function(err, document: IUserFollower) {
+    UserFollowerModel.create(req.body, function(err, document: IUserFollower) {
       if(err) { return UserFollowerCtrl.handleError(res, err); }
       return res.status(201).json(document);
     });
@@ -22,7 +22,7 @@ export class UserFollowerCtrl {
   // Updates an existing state in the DB.
   public static update(req, res) {
     if(req.body._id) { delete req.body._id; }
-    UserFollower.findById(req.params.id, function (err, document: IUserFollower) {
+    UserFollowerModel.findById(req.params.id, function (err, document: IUserFollower) {
       if (err) { return UserFollowerCtrl.handleError(res, err); }
       if(!document) { return res.status(404).send('Not Found'); }
       var updated = _.merge(document, req.body);
@@ -35,7 +35,7 @@ export class UserFollowerCtrl {
 
   // Deletes a state from the DB.
   public static destroy(req, res) {
-    UserFollower.find({ _id: req.params.id }).remove(function(err) {
+    UserFollowerModel.find({ _id: req.params.id }).remove(function(err) {
       if(err) { return UserFollowerCtrl.handleError(res, err); }
       return res.status(204).send('No Content');
     });

@@ -1,13 +1,13 @@
 import {ApiCtrl} from "../ApiCtrl";
-import {IUserFollower, UserFollower} from './user-follower.model';
-import {IActivity} from "../activity/activity.model";
-import {IActivityUser} from "../activity-user/activity-user.model";
+import {IUserFollowerModel, UserFollower, IUserFollower} from './user-follower.model';
+import {IActivity, IActivityModel} from "../activity/activity.model";
+import {IActivityUser, IActivityUserModel, ActivityUser} from "../activity-user/activity-user.model";
 import {ActivityOperations} from "../activity/activity.operations";
 import * as Q from 'q';
 import {UserOperations} from "../user/user.operations";
-import {IUser} from "../user/user.model";
+import {IUser, IUserModel} from "../user/user.model";
 
-class UserFollowerOp extends ApiCtrl<IUserFollower> {
+class UserFollowerOp extends ApiCtrl<IUserFollowerModel, UserFollower> {
   constructor() {
     super(UserFollower)
   }
@@ -16,19 +16,19 @@ class UserFollowerOp extends ApiCtrl<IUserFollower> {
     return this.getActivitiesBy({userId: userId, isRecommendation: false});
   }
 
-  public getUsersFollowers(userId: string): Q.Promise<IUser[]> {
+  public getUsersFollowers(userId: string): Q.Promise<IUserModel[]> {
     return this.getUsersBy({ userId: userId })
   }
 
-  public getWhoUsersFollowing(userId: string): Q.Promise<IUser[]> {
+  public getWhoUsersFollowing(userId: string): Q.Promise<IUserModel[]> {
     return this.getUsersBy({ followerId: userId })
   }
 
-  private getUsersBy(params: Object): Q.Promise<IUser[]> {
+  private getUsersBy(params: Object): Q.Promise<IUserModel[]> {
     return this.getBy(params)
-    .then((activityUsers: IActivityUser[]) => {
-      return UserOperations.getBy({userId: {$in: activityUsers.map(item => item.userId)}})
-      .then((users: IUser[]) => {
+    .then((user: IUserFollower[]) => {
+      return UserOperations.getBy({userId: {$in: user.map(item => item.userId)}})
+      .then((users: IUserModel[]) => {
         return users
       })
     })
@@ -36,9 +36,9 @@ class UserFollowerOp extends ApiCtrl<IUserFollower> {
 
   private getActivitiesBy(params: Object): Q.Promise<IActivity[]> {
     return this.getBy(params)
-    .then((activityUsers: IActivityUser[]) => {
+    .then((activityUsers: IActivityUserModel[]) => {
       return ActivityOperations.getBy({userId: {$in: activityUsers.map(item => item.userId)}})
-      .then((activities: IActivity[]) => {
+      .then((activities: IActivityModel[]) => {
         return activities
       })
     })

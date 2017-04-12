@@ -1,10 +1,10 @@
 import { Model, Document } from 'mongoose';
 import * as Q from 'q';
 import * as _ from 'lodash';
+import {BaseDocument} from "../models/BaseDocument";
 
 export interface ApiModel<T extends Document> extends Model<T> {}
-
-export class ApiCtrl<T extends Document> {
+export class ApiCtrl<T extends Document, U extends BaseDocument> {
   protected Collection: ApiModel<T>;
 
   constructor(model: any) {
@@ -13,7 +13,7 @@ export class ApiCtrl<T extends Document> {
 
   public getAll(): Q.Promise<T[]> {
     return Q.Promise<T[]>((resolve, reject) => {
-      this.Collection.find({}, function(err, documents: T[]) {
+      this.Collection.find({}, (err, documents: T[]) => {
         if (err) return reject(err);
         return resolve(documents)
       });
@@ -22,16 +22,16 @@ export class ApiCtrl<T extends Document> {
 
   public getById(id: string): Q.Promise<T> {
     return Q.Promise<T>((resolve, reject) => {
-      this.Collection.findById(id, function (err, document: T) {
+      this.Collection.findById(id, (err, document: T) => {
         if (err) return reject(err);
         return resolve(document)
       });
     })
   }
 
-  public getBy(params: Object): Q.Promise<Object[]> {
-    return Q.Promise<Object[]>((resolve, reject) => {
-      this.Collection.find(params, function(err, documents: Object[]) {
+  public getBy(params: Object): Q.Promise<T[]> {
+    return Q.Promise<T[]>((resolve, reject) => {
+      this.Collection.find(params, function(err, documents: T[]) {
         if (err) return reject(err);
         return resolve(documents)
       });
@@ -39,9 +39,9 @@ export class ApiCtrl<T extends Document> {
   }
 
   // Creates a new state in the DB.
-  public create(activityUser: T): Q.Promise<T> {
+  public create(activityUser: U): Q.Promise<T> {
     return Q.Promise<T>((resolve, reject) => {
-      this.Collection.create(activityUser, function (err, document: T) {
+      this.Collection.create(activityUser, (err, document: T) => {
         if (err) return reject(err);
         return resolve(document)
       });
@@ -49,7 +49,7 @@ export class ApiCtrl<T extends Document> {
   }
 
   // Updates an existing state in the DB.
-  public update(activityUser: T): Q.Promise<T> {
+  public update(activityUser: U): Q.Promise<T> {
     return Q.Promise<T>((resolve, reject) => {
       this.Collection.findById(activityUser._id, function (err, document: T) {
         if (err) {
@@ -77,10 +77,5 @@ export class ApiCtrl<T extends Document> {
         return resolve("Deleted");
       });
     });
-  }
-
-  public static handleError(res, err) {
-    console.error(err);
-    return res.status(500).send({ error: err });
   }
 }
