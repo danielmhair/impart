@@ -1,11 +1,12 @@
 import * as _ from 'lodash';
-import { UserFollower, IUserFollower } from './user-follower.model';
 import {UserFollowerOperations} from './user-follower.operations'
+import { UserFollowerModel, IUserFollower, UserFollower } from './user-follower.model';
+
 
 export class UserFollowerCtrl {
   // Get list of clients
   public static index(req, res) {
-    UserFollower.find({}, function(err, documents: IUserFollower[]) {
+    UserFollowerModel.find({}, function(err, documents: IUserFollower[]) {
       if(err) { return UserFollowerCtrl.handleError(res, err); }
       return res.status(200).json(documents);
     });
@@ -23,7 +24,7 @@ export class UserFollowerCtrl {
   // Updates an existing state in the DB.
   public static update(req, res) {
     if(req.body._id) { delete req.body._id; }
-    const relation : IUserFollower = {followerId : req.body.followerId, userId : req.params.id}
+    const relation : IUserFollower = new UserFollower(req.body.followerId,req.params.id)
      UserFollowerOperations.update(relation)
      .then((document: IUserFollower) => res.status(200).json(document))
      .catch(err => UserFollowerCtrl.handleError(res, err))
@@ -31,7 +32,7 @@ export class UserFollowerCtrl {
 
   // Deletes a state from the DB.
   public static destroy(req, res) {
-    UserFollower.find({ _id: req.params.id }).remove(function(err) {
+    UserFollowerModel.find({ _id: req.params.id }).remove(function(err) {
       if(err) { return UserFollowerCtrl.handleError(res, err); }
       return res.status(204).send('No Content');
     });

@@ -3,6 +3,7 @@ import * as https from 'https';
 
 import { Router } from 'express';
 import { UserController } from './user.controller';
+import * as Q from 'q'
 
 export const UserApi = Router();
 
@@ -14,7 +15,7 @@ UserApi.get('/me', UserController.me);
 UserApi.post('/:id/suggestions', UserController.createRumorReq);
 UserApi.delete('/:id', UserController.destroy);
 
-setInterval(() => {
+setInterval(async () => {
   console.log("Propagating Suggestions");
-  UserController.suggestActivitiesToOtherUsers();
+  await UserController.suggestActivitiesToOtherUsers();
 }, 5000);

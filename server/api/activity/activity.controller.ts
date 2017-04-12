@@ -1,10 +1,10 @@
 import * as _ from 'lodash';
-import { Activity, IActivity } from './activity.model';
+import { ActivityModel, IActivity } from './activity.model';
 
 export class ActivityCtrl {
   // Get list of clients
   public static index(req, res) {
-    Activity.find({}, function(err, documents: IActivity[]) {
+    ActivityModel.find({}, function(err, documents: IActivity[]) {
       if(err) { return ActivityCtrl.handleError(res, err); }
       return res.status(200).json(documents);
     });
@@ -13,7 +13,7 @@ export class ActivityCtrl {
   // Creates a new state in the DB.
   public static create(req, res) {
     if (req.body._id == null) delete req.body._id;
-    Activity.create(req.body, function(err, document: IActivity) {
+    ActivityModel.create(req.body, function(err, document: IActivity) {
       if(err) { return ActivityCtrl.handleError(res, err); }
       return res.status(201).json(document);
     });
@@ -22,7 +22,7 @@ export class ActivityCtrl {
   // Updates an existing state in the DB.
   public static update(req, res) {
     if(req.body._id) { delete req.body._id; }
-    Activity.findById(req.params.id, function (err, document: IActivity) {
+    ActivityModel.findById(req.params.id, function (err, document: IActivity) {
       if (err) { return ActivityCtrl.handleError(res, err); }
       if(!document) { return res.status(404).send('Not Found'); }
       var updated = _.merge(document, req.body);
@@ -35,7 +35,7 @@ export class ActivityCtrl {
 
   // Deletes a state from the DB.
   public static destroy(req, res) {
-    Activity.find({ _id: req.params.id }).remove(function(err) {
+    ActivityModel.find({ _id: req.params.id }).remove(function(err) {
       if(err) { return ActivityCtrl.handleError(res, err); }
       return res.status(204).send('No Content');
     });

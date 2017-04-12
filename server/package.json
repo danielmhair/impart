@@ -41,6 +41,7 @@
     "fs-extra": "1.0.0",
     "helmet": "3.5.0",
     "jsonwebtoken": "7.3.0",
+    "lodash": "^4.17.4",
     "method-override": "2.3.8",
     "mongoose": "4.9.3",
     "morgan": "1.7.0",

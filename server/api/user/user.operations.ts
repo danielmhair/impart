@@ -1,9 +1,9 @@
 import {ApiCtrl} from "../ApiCtrl";
-import { IUser, User } from './user.model';
+import {IUserModel, User, UserModel} from './user.model';
 
-class ActivityUserOp extends ApiCtrl<IUser> {
+class ActivityUserOp extends ApiCtrl<IUserModel, User> {
   constructor() {
-    super(User)
+    super(UserModel)
   }
 }
 export const UserOperations = new ActivityUserOp();
