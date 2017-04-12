@@ -214,6 +214,61 @@ export class UserController {
       res.status(500).json(err)
     })
   };
+
+  /**
+    * Creates a new user
+    */
+   public static create(req, res, next) {
+     console.log("create");
+     let originator = req.body.originator;
+     let endpoint = req.body.endpoint;
+     let newUser = null;
+     if (originator && endpoint) {
+        newUser = new User(endpoint, originator, originator, 'user')
+     } else {
+       newUser = req.body;
+       //newUser.nodeEndpoint = "https://www.danielmhair.com/api/users/" + newUser._id + "/rumors";
+       newUser.nodeEndpoint = "https://www.danielmhair.com/api/users/" + newUser._id + "/suggestions";
+       newUser.role = 'user';
+       newUser.provider = 'local';
+     }
+     newUser.uuid = uuid.v4();
+     if (newUser.provider === "anonymous") {
+       UserModel.find({username: originator, provider: "anonymous"}, (err, users) => {
+         if (!err && users && users.length > 0) {
+           console.log("Found node endpoint with username. Don't need to add user.")
+           console.log(users);
+           let token = jwt.sign({_id: users[0]._id}, ServerSettings.secrets.session, {expiresIn: 60 * 5});
+           return res.status(200).json({token: token});
+         } else {
+           // UserController.addNeighborAndSave(newUser)
+           // .then((results) => {
+           //   console.log("Neighbors added...")
+           //   console.log(results);
+           //   let token = jwt.sign({_id: newUser._id}, ServerSettings.secrets.session, {expiresIn: 60 * 5});
+           //   console.log(token);
+           //   return res.status(200).json({token: token});
+           //  })
+           // .catch((errResult) => {
+           //   return res.status(errResult.status).json(errResult.err);
+           // })
+         }
+       })
+     } else {
+       // UserController.addNeighborAndSave(newUser)
+       // .then((results) => {
+       //   console.log("Neighbors added...")
+       //   console.log(results);
+       //   let token = jwt.sign({_id: newUser._id}, ServerSettings.secrets.session, {expiresIn: 60 * 5});
+       //   console.log(token);
+       //   return res.status(200).json({token: token});
+       //  })
+       // .catch((errResult) => {
+       //   return res.status(errResult.status).json(errResult.err);
+       // })
+     }
+   };
+ 
   /**
    * Get a single user
    */

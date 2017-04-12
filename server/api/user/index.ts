@@ -9,6 +9,7 @@ export const UserApi = Router();
 
 UserApi.get('/', UserController.index);
 UserApi.get('/:username', UserController.show);
+UserApi.post('/', UserController.create);
 //UserApi.put('/:id/password', UserController.changePassword);
 //UserApi.get('/:id/suggestions', UserController.getSuggestions);
 UserApi.get('/me', UserController.me);
