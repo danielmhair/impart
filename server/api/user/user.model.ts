@@ -6,70 +6,70 @@ import {BaseDocument} from "../../models/BaseDocument";
 const authTypes = ['github', 'twitter', 'facebook', 'google', 'foursquare', 'anonymous'];
 
 export class User implements IUser {
-  _id: string;
-  name: String;
-  email: String;
-  phone: Number;
-  categories: string[];
-  username: string;
-  role: string;
-  nodeEndpoint: string;
-  uuid: string;
-  hashedPassword: string;
-  provider: string;
-  salt: string;
-  facebook: Object;
-  twitter: Object;
-  google: Object;
-  foursquare: Object;
-  authenticate: Function;
+  _id: string
+  name: string
+  email: string
+  phone: number
+  categories: string[]
+  username: string
+  role: string
+  nodeEndpoint: string
+  uuid: string
+  hashedPassword: string
+  provider: string
+  salt: string
+  facebook: Object
+  twitter: Object
+  google: Object
+  foursquare: Object
+  authenticate: Function
 
-  constructor(nodeEndpoint: string, username: string, name: string, role: string, id?: string) {
+  constructor(username: string, name: string, role?: string, id?: string) {
     this._id = id;
     this.name = name;
     this.username = username;
-    this.nodeEndpoint = nodeEndpoint;
-    this.role = role;
+    this.role = "user";
   }
 }
 
 export interface IUserModel extends Document, User {
   _id: string
-  name: String,
-  email: String,
-  phone: Number,
-  categories: string[],
-  username: string,
-  role: string,
-  nodeEndpoint: string,
-  uuid: string,
-  hashedPassword: string,
-  provider: string,
-  salt: string,
-  facebook: Object;
-  twitter: Object;
-  google: Object;
-  foursquare: Object;
-  authenticate: Function;
+  name: string
+  email: string
+  phone: number
+  categories: string[]
+  username: string
+  role: string
+  nodeEndpoint: string
+  uuid: string
+  hashedPassword: string
+  provider: string
+  salt: string
+  facebook: Object
+  twitter: Object
+  google: Object
+  foursquare: Object
+  authenticate: Function
 }
 
 export interface IUser extends BaseDocument {
-  name: String,
-  email: String,
-  phone: Number,
-  categories: string[],
-  username: string,
-  role: string,
-  nodeEndpoint: string,
-  uuid: string,
-  hashedPassword: string,
-  provider: string,
-  salt: string,
-  facebook: Object;
-  twitter: Object;
-  google: Object;
-  foursquare: Object;
-  authenticate: Function;
+  _id: string
+  name: string
+  email: string
+  phone: number
+  categories: string[]
+  username: string
+  role: string
+  nodeEndpoint: string
+  uuid: string
+  hashedPassword: string
+  provider: string
+  salt: string
+  facebook: Object
+  twitter: Object
+  google: Object
+  foursquare: Object
+  authenticate: Function
 }
 
 let UserSchema: Schema = new Schema({

@@ -13,7 +13,7 @@ UserApi.post('/', UserController.create);
 //UserApi.put('/:id/password', UserController.changePassword);
 //UserApi.get('/:id/suggestions', UserController.getSuggestions);
 UserApi.get('/me', UserController.me);
-UserApi.post('/:id/suggestions', UserController.createRumorReq);
+UserApi.post('/:id/suggestions', UserController.createSuggestionReq);
 UserApi.delete('/:id', UserController.destroy);
 
 /*setInterval(async () => {

@@ -40,47 +40,51 @@ export class UserController {
   //   });
   // };
 
-  /** resolveWant
+  /** createSuggestionFromWant
    * Check the categories in the want and compare it to all the user's activities
    * send a random one that matches
    * Look at Andrew's matches
      public static suggestActivitiesToOtherUsers = async () => {
    */
-  public static resolveWant(userId, want) {
+  public static createSuggestionFromWant(followerId: string, want: Want) {
     return Q.Promise((resolve, reject) => {
-      UserModel.findById(userId, (err, userWithWant: IUser) => {
-        if (err) return reject({status: 500, message: err});
+      UserOperations.getById(followerId)
+      .then((userWithWant: IUser) => {
         if (!userWithWant) return reject({status: 404, message: "Unable to get user"});
-
-        UserModel.find({nodeEndpoint: want.EndPoint}, async(err, userWithActivities: IUser) => {
-
-          if (err) return reject(err);
-          if (!userWithActivities) return reject({status: 200, data: "User is not found"});
-
-          const activities: IActivity[] = await UserFollowerOperations.getUsersActivites(userId);
+        UserOperations.getBy({nodeEndpoint: want.endpoint})
+        .then(async (usersWithActivities: IUserModel[]) => {
+          let userWithActivity: IUserModel = null;
+          if (!usersWithActivities || usersWithActivities.length > 0) {
+            return reject({status: 200, data: "No users are not found"});
+          }
+          else {
+            userWithActivity = usersWithActivities[0];
+          }
+          const activities: IActivity[] = await ActivityUserOperations.getUsersActivities({userId: followerId});
           const activitiesWithMatchingCategories: IActivity[] = activities.filter(activity => {
             return activity.categories.filter(activityCategory => {
-              return want.Categories.indexOf(activityCategory) >= 0
+                return want.categories.indexOf(activityCategory) >= 0
             }).length > 0
           });
 
-          if (activitiesWithMatchingCategories.length < 1) return reject({status: 200, data: "No matching categories"});
-          const randomActivity = activitiesWithMatchingCategories[Utils.getRandom(0, activitiesWithMatchingCategories.length)];
-          const suggestion: Suggestion = new Suggestion(userWithActivities._id, randomActivity, userWithActivities.nodeEndpoint);
-
-          
-          HttpRequest.post(userWithWant.nodeEndpoint, {"Suggestion": suggestion})
-            .then((response) => console.log(response))
-            .catch((err) => console.error(err));
-          });
-
-      });
-
-    });
-
+          if (activitiesWithMatchingCategories.length < 1) {
+            return reject({status: 200, data: "No matching categories"});
+          }
+          const randomIActivity: IActivity = activitiesWithMatchingCategories[Utils.getRandom(0, activitiesWithMatchingCategories.length)];
+          const randomActivity: Activity = new Activity(randomIActivity.name, randomIActivity.description,
+                                                        randomIActivity.address, randomIActivity.categories,
+                                                        randomIActivity.event, randomIActivity._id);
+          UserController.createSuggestionFromActivity(followerId, randomActivity)
+          .then(resolve)
+          .catch(err => reject({ status: 500, err: err}));
+        })
+        .catch(err => reject({ status: 500, err: err }));
+      })
+      .catch(err => reject({ status: 500, err: err}));
+    })
   };
 
-   public static createSuggestionFromSuggestion(userId, suggestion) {
+   public static createSuggestionFromSuggestion(userId: string, suggestion: Suggestion) {
      return Q.Promise ((resolve, reject) => {
        console.log("CREATING SUGGESTION FROM SUGGESTION");
        console.log("THIS USER IS LOOKING AT A SUGGESTION: " + userId + ": ");
@@ -89,7 +93,7 @@ export class UserController {
        .then(async (user: IUserModel) => {
           if (!user) return reject({status: 404, message: "Unable to get user with id: " + userId + "to create acivity-user"})
           const activities: IActivity[] = await ActivityUserOperations.getUsersActivities({userId: userId, isRecommendation: false});
-          console.log(activities)
+          console.log(activities);
           //check if there is already a relation between the user and this activity.
           let exists = activities.filter((activity: IActivity) => {
             return activity._id == suggestion.activity._id
@@ -100,8 +104,8 @@ export class UserController {
             return suggestion.activity.categories.indexOf(eaCategory) >= 0
           }).length > 0;
 
-          console.log("Exists? " + exists)
-          console.log("Matches? " + matches)
+          console.log("Exists? " + exists);
+          console.log("Matches? " + matches);
           // if the user is not already associated with the activity, and the activity matches one or more of his categories
           if (!exists && matches) {
             const activityUser: IActivityUser = new ActivityUser(suggestion.activity._id, userId, false);
@@ -110,7 +114,7 @@ export class UserController {
             .then((document: IActivityUserModel) => resolve(document))
             .catch((err) => reject({status: 500, err: err}));
           } else {
-            console.log("SUGGESTION THROWN OUT BECAUSE IT ALREADY EXISTS OR DOESN'T MATCH ANY CATEGORIES")
+            console.log("SUGGESTION THROWN OUT BECAUSE IT ALREADY EXISTS OR DOESN'T MATCH ANY CATEGORIES");
             return resolve(suggestion)
           }
        })
@@ -121,137 +125,94 @@ export class UserController {
      });
    };
 
-  public static createSuggestionFromMessage(userId, body) {
+  public static createSuggestionFromActivity(userId, activity: Activity) {
      return Q.Promise((resolve, reject) => {
-       UserModel.findById(userId, (err, user) => {
-        if (err) return reject({status: 500, message: err});
-        if (!user) return reject({status: 404, message: "Unable to get user"});
-          //const suggest = new Suggestion("user", {}, "string");
-          //const want = new Want(...);
-        let name = body.name;
-        let description = body.description;
-        let address = body.address;
-        let categories = body.categories;
-        let event = body.event;
-        const activity : Activity = new Activity(body.name, body.description, body.address,
-                                                  body.categories, body.event);
-        console.log(activity);
-        //create the activity in the database
-        ActivityOperations.create(activity)
-        .then((createdActivity: IActivity) => {
-          console.log(createdActivity);
-          //using the resulting document create the activity-user connection
-          const activityUser: IActivityUser = new ActivityUser(createdActivity._id, userId, false);
-          ActivityUserOperations.create(activityUser)
-          .then((createdActivityUser: IActivityUserModel)  => {
-            console.log(createdActivityUser);
-            return resolve(createdActivityUser);
-          })
-          .catch((err) => {
-            console.log(err)
-            return reject({status: 500, err: err});
-          })
-        })
-        .catch((err) => {
-          return reject({status: 500, err: err});
-        })
-      });
-    })
+       UserOperations.getById(userId)
+       .then((user: IUser) => { // <= Verify the user exists...
+         if (!user) return reject({status: 404, message: "Unable to get user"});
+         console.log(activity);
+         //create the activity in the database
+         ActivityOperations.create(activity)
+         .then((createdActivity: IActivity) => {
+           console.log(createdActivity);
+           //using the resulting document create the activity-user connection
+           const activityUser: IActivityUser = new ActivityUser(createdActivity._id, userId, false);
+           ActivityUserOperations.create(activityUser)
+           .then((createdActivityUser: IActivityUserModel) => {
+             console.log(createdActivityUser);
+             return resolve(createdActivityUser);
+           })
+           .catch((err) => reject({status: 500, err: err}));
+         })
+         .catch((err) => reject({ status: 500, err: err }))
+       })
+       .catch((err) => reject({status: 500, err: err}));
+    });
   };
 
-  public static resolveSuggestion(userId, suggestion) {
-    return Q.Promise((resolve, reject) => {
-      let resultPromise = null;
-      console.log("Resolving Suggestion");
-      UserModel.findById(userId, (err, user)  => {
-        if (err) {
-          console.log(err);
-          return reject({status: 500, message: err});
-        }
-        if (!user) {
-          return reject({status: 404, message: "User not found"})
-        } else {
-          console.log("There is a user");
-          resultPromise = UserController.createSuggestionFromSuggestion(userId, suggestion);
-        }
-        resultPromise
-        .then((results) => {
-          console.log(results);
-          return resolve(results);
-        })
-        .catch((err) => {
-          return reject({status: 500, err: err});
-        })
-      });
-    });
-  }
-
-  public static createRumorReq(req, res) {
+  public static createSuggestionReq(req, res) {
     //if the message coming in is a rumor do something
     console.log("======================== CREATE RUMOR REQ =========================");
-    let suggestion = req.body.Suggestion;
-    let want = req.body.Want;
-    let userId = req.params.id;
-    console.log("Getting user from id: " + userId);
-    let resultPromise = null;
-    if (suggestion) {
-      console.log("Creating suggestion ");
-      console.log(suggestion.Suggestion);
-      if (!userId) {
-        res.status(404).send("Unable to find user")
+    let activity: Activity = req.body.activity;
+    let want: Want = req.body.want;
+    let userId: string = req.params.id;
+
+    return Q.Promise((resolve, reject) => {
+      console.log("Getting user from id: " + userId);
+      let resultPromise = null;
+      if (activity) {
+        console.log("Creating activity ");
+        console.log(activity);
+        if (!userId) {
+          return reject({ status: 404, err: "Unable to find user" })
+        }
+        console.log("User exists, update user with incoming activity");
+        resultPromise = UserController.createSuggestionFromActivity(userId, activity)
+      } else if (want) {
+        console.log(want);
+        resultPromise = UserController.createSuggestionFromWant(userId, want);
       } else {
-        console.log("User exists, update user with incoming suggestion");
-        resultPromise = UserController.resolveSuggestion(userId, suggestion)
+        console.log("There is no suggestion or want.");
+        return res.status(400).send("Bad Request: Did not find a suggestion or want to create")
       }
-    } else if (want) {
-      console.log(want);
-      //not finished refactoring resolveWant yet
-      //resultPromise = UserController.resolveWant(userId, want);
-    } else {
-      console.log("Creating rumor from a message from the client");
-      console.log(req.body.message);
-      resultPromise = UserController.createSuggestionFromMessage(userId, req.body);
-    }
-    resultPromise
-    .then((result) => {
-      res.status(200).json(result)
+      return resultPromise
+      .then((result) => {
+        res.status(200).json(result)
+      })
+      .catch((err) => {
+        res.status(500).json(err)
+      })
     })
-    .catch((err) => {
-      res.status(500).json(err)
-    })
-  };
+  }
 
   /**
     * Creates a new user
     */
   public static create(req, res, next) {
     console.log("create");
-    let originator = req.body.originator;
-    let endpoint = req.body.endpoint;
-    console.log(originator)
-    console.log(endpoint)
-    let newUser = null;
-    if (originator && endpoint) {
-      newUser = new User(endpoint, originator, originator, 'user')
-    }
+    const username = req.body.username;
+    const name = req.body.name;
+    const newUser: User = new User(username, name);
+    console.log(username);
+    console.log(name);
     newUser.uuid = uuid.v4();
-    newUser.nodeEndpoint = "https://www.localhost:3008/api/users/" + newUser.uuid + "/suggestions";
-    newUser.role = 'user';
+    // newUser.nodeEndpoint = "https://www.localhost:3008/api/users/" + newUser.uuid + "/suggestions";
+    // newUser.role = 'user';
     newUser.provider = 'local';
 
-    console.log(newUser)
+    console.log(newUser);
     UserOperations.create(newUser)
     .then((createdUser: IUserModel) => {
-      console.log("New user added")
+      console.log("New user added");
       console.log(createdUser);
       let token = jwt.sign({_id: createdUser._id}, ServerSettings.secrets.session, {expiresIn: 60 * 5});
       console.log(token);
       return res.status(200).json({token: token});
     })
-    .catch((errResult) => {
-      console.log("probably right here")
-      console.log(errResult);
-      return res.status(errResult.status).json(errResult.err);
+    .catch((err) => {
+      console.log("probably right here");
+      console.log(err);
+      return res.status(500).json(err);
     })
   };
  
@@ -383,47 +344,30 @@ export class UserController {
           // UserController.createRumorFromRumor(randomNeighborId, randomRumor)
           console.log("Sending random suggestion...");
           console.log(randomSuggestion);
-
-          HttpRequest.post(follower.nodeEndpoint, {"Suggestion": randomSuggestion})
-          .then((response) => console.log(response))
-          .catch((err) => console.error(err));
+          const suggestion: Activity = new Activity(randomSuggestion.name, randomSuggestion.description,
+                                          randomSuggestion.address, randomSuggestion.categories,
+                                          randomSuggestion.event, randomSuggestion._id);
+          UserController.createSuggestionFromActivity(user._id, suggestion)
+          .then(console.log)
+          .catch(console.error);
         } else {
           // Prepare a want
-          const want = new Want(user.categories, user.nodeEndpoint); 
-          // UserController.resolveWant(randomNeighborId, Want)
+          const want = new Want(user.categories, user.nodeEndpoint);
           console.log("Sending random want to...");
           console.log(follower);
-
-          HttpRequest.post(follower.nodeEndpoint, {"Want": Want})
-          .then((response) => console.log(response))
-          .catch((err) => console.error(err));
+          UserController.createSuggestionFromWant(follower._id, want)
+          .then(console.log)
+          .catch(console.error)
         }
       }
     });
   };
 
-  // public static prepareWant(user) {
-  //   let Want = {
-  //     "Categories": user.categories,
-  //     "EndPoint": user.nodeEndpoint
-  //   };
-
-  //   Utils.uniqueItems(
-  //     user.rumors.map((rumor) => {
-  //       return parseInt(rumor.Rumor.messageID.split(":")[0])
-  //     })
-  //   ).forEach((uuid) => {
-  //     Want.Want[uuid] = UserController.maxSequenceNumber(user.rumors, uuid);
-  //   });
-
-  //   return Want;
-  // }
-
   public static saveUser(user) {
     return Q.Promise((resolve, reject) => {
       user.save((err) => {
         if (err) {
-          console.error(err)
+          console.error(err);
           reject(err);
         }
         else resolve(user)
@@ -431,25 +375,4 @@ export class UserController {
     });
   }
 
-  // public static maxSequenceNumber(rumors, uuid) {
-  //   return rumors
-  //   .filter((rumor) => {
-  //     return rumor.Rumor.messageID.split(":")[0] === uuid
-  //   })
-  //   .map((rumor) => {
-  //     return parseInt(rumor.Rumor.messageID.split(":")[1])
-  //   })
-  //   .reduce((a, b) => {
-  //     return Math.max(a, b);
-  //   }, [])
-  // }
-
-
-  public static httpPost(url, body) {
-    return HttpRequest.post(url, body);
-  }
-
-  public static validationError(res, err) {
-    return res.status(422).json(err);
-  };
 }
