@@ -8,6 +8,7 @@ import * as Q from 'q';
 import { Utils } from '../../utils';
 import {HttpRequest} from "../http-request";
 import { Want } from "../../models/Want"
+import { Suggestion } from "../../models/Suggestion"
 import { UserOperations } from "../user/user.operations"
 
 import { IActivityModel, ActivityModel, IActivity, Activity } from '../activity/activity.model';
@@ -43,6 +44,7 @@ export class UserController {
    * Check the categories in the want and compare it to all the user's activities
    * send a random one that matches
    * Look at Andrew's matches
+     public static suggestActivitiesToOtherUsers = async () => {
    */
   public static resolveWant(userId, want) {
     return Q.Promise((resolve, reject) => {
@@ -50,25 +52,27 @@ export class UserController {
         if (err) return reject({status: 500, message: err});
         if (!userWithWant) return reject({status: 404, message: "Unable to get user"});
 
-        UserModel.find({nodeEndpoint: want.EndPoint}, (err, userWithActivities: IUser) => {
+        UserModel.find({nodeEndpoint: want.EndPoint}, async(err, userWithActivities: IUser) => {
+
           if (err) return reject(err);
           if (!userWithActivities) return reject({status: 200, data: "User is not found"});
-          //if (!userWithActivities.rumors) userWithActivities.rumors = [];
-          //activities: IActivity[] = UserOperations.getCa
-          // let rumorsToAdd = userWithActivities.rumors
-          // .filter((rumor) => {
-          //   let uuids = Object.keys(want.Want);
-          //   let messageIdParts = rumor.Rumor.messageID.split(":");
-          //   let rumorUuid = messageIdParts[0];
-          //   let rumorSequence = messageIdParts[1];
-          //   return rumorSequence > want.Want[rumorUuid];
-          // });
-          // userWithWant.rumors = userWithWant.rumors.concat(rumorsToAdd);
-          // userWithWant.save((err) => {
-          //   if (err) return reject(err);
-          //   return resolve(rumorsToAdd)
-          // })
-        });
+
+          const activities: IActivity[] = await UserFollowerOperations.getUsersActivites(userId);
+          const activitiesWithMatchingCategories: IActivity[] = activities.filter(activity => {
+            return activity.categories.filter(activityCategory => {
+              return want.Categories.indexOf(activityCategory) >= 0
+            }).length > 0
+          });
+
+          if (activitiesWithMatchingCategories.length < 1) return reject({status: 200, data: "No matching categories"});
+          const randomActivity = activitiesWithMatchingCategories[Utils.getRandom(0, activitiesWithMatchingCategories.length)];
+          const suggestion: Suggestion = new Suggestion(userWithActivities._id, randomActivity, userWithActivities.nodeEndpoint);
+
+          
+          HttpRequest.post(userWithWant.nodeEndpoint, {"Suggestion": suggestion})
+            .then((response) => console.log(response))
+            .catch((err) => console.error(err));
+          });
 
       });
 
@@ -390,6 +394,7 @@ export class UserController {
               return follower.categories.indexOf(activityCategory) >= 0
             }).length > 0
           });
+
           const randSuggestionIdx = Utils.getRandom(0, suggestionsMatchingUsers.length);
           let randomSuggestion = suggestionsMatchingUsers[randSuggestionIdx];
 
