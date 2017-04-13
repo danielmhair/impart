@@ -1,75 +1,72 @@
 'use strict';
 
-import { Schema, model, Document } from 'mongoose';
+import { Schema, model, Document, Types } from 'mongoose';
 import { pbkdf2Sync, randomBytes } from 'crypto';
 import {BaseDocument} from "../../models/BaseDocument";
 const authTypes = ['github', 'twitter', 'facebook', 'google', 'foursquare', 'anonymous'];
 
 export class User implements IUser {
-  _id: string
-  name: string
-  email: string
-  phone: number
-  categories: string[]
-  username: string
-  role: string
-  nodeEndpoint: string
-  uuid: string
-  hashedPassword: string
-  provider: string
-  salt: string
-  facebook: Object
-  twitter: Object
-  google: Object
-  foursquare: Object
-  authenticate: Function
+  _id: string;
+  name: string;
+  email: string;
+  phone: number;
+  categories: string[];
+  username: string;
+  role: string;
+  nodeEndpoint: string;
+  uuid: string;
+  hashedPassword: string;
+  provider: string;
+  salt: string;
+  facebook: Object;
+  twitter: Object;
+  google: Object;
+  foursquare: Object;
+  authenticate: Function;
 
-  constructor(username: string, name: string, role?: string, id?: string) {
-    this._id = id;
+  constructor(username: string, name: string, role?: string) {
     this.name = name;
     this.username = username;
     this.role = "user";
   }
 }
 
-export interface IUserModel extends Document, User {
-  _id: string
-  name: string
-  email: string
-  phone: number
-  categories: string[]
-  username: string
-  role: string
-  nodeEndpoint: string
-  uuid: string
-  hashedPassword: string
-  provider: string
-  salt: string
-  facebook: Object
-  twitter: Object
-  google: Object
-  foursquare: Object
-  authenticate: Function
+export interface IUserModel extends Document {
+  name: string;
+  email: string;
+  phone: number;
+  categories: string[];
+  username: string;
+  role: string;
+  nodeEndpoint: string;
+  uuid: string;
+  hashedPassword: string;
+  provider: string;
+  salt: string;
+  facebook: Object;
+  twitter: Object;
+  google: Object;
+  foursquare: Object;
+  authenticate: Function;
 }
 
 export interface IUser extends BaseDocument {
-  _id: string
-  name: string
-  email: string
-  phone: number
-  categories: string[]
-  username: string
-  role: string
-  nodeEndpoint: string
-  uuid: string
-  hashedPassword: string
-  provider: string
-  salt: string
-  facebook: Object
-  twitter: Object
-  google: Object
-  foursquare: Object
-  authenticate: Function
+  name: string;
+  email: string;
+  phone: number;
+  categories: string[];
+  username: string;
+  role: string;
+  nodeEndpoint: string;
+  uuid: string;
+  hashedPassword: string;
+  provider: string;
+  salt: string;
+  facebook: Object;
+  twitter: Object;
+  google: Object;
+  foursquare: Object;
+  authenticate: Function;
 }
 
 let UserSchema: Schema = new Schema({
