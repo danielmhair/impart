@@ -99,7 +99,7 @@ export class UserController {
        }
        UserOperations.getById(userId)
        .then(async (user: IUserModel) => {
-          if (!user) return reject({status: 404, message: "Unable to get user with id: " + userId + "to create acivity-user"})
+          if (!user) return reject({status: 404, message: "Unable to get user with id: " + userId + "to create acivity-user"});
           const activities: IActivity[] = await ActivityUserOperations.getUsersActivities({userId: userId, isRecommendation: false});
           console.log(activities);
           //check if there is already a relation between the user and this activity.

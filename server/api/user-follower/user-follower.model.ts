@@ -17,8 +17,7 @@ export interface IUserFollower extends BaseDocument {
   userId: string;
 }
 
-export interface IUserFollowerModel extends UserFollower, Document {
-  _id: string;
+export interface IUserFollowerModel extends Document {
   followerId: string;
   userId: string;
 }
