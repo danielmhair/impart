@@ -89,8 +89,7 @@ export class UserController {
        console.log("CREATING SUGGESTION FROM SUGGESTION");
        console.log("THIS USER IS LOOKING AT A SUGGESTION: " + userId + ": ");
        console.log(activity);
-       const duplicate = await ActivityOperations.getById(activity._id)
-       if(!duplicate){
+       if(!activity._id){
           //create a new Activity here in this place
            console.log("Needed to create a brand new Activity")
            ActivityOperations.create(activity)
