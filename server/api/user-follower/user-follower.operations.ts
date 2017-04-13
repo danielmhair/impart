@@ -2,6 +2,7 @@ import {ApiCtrl} from "../ApiCtrl";
 import {IUserFollowerModel, UserFollower, IUserFollower, UserFollowerModel} from './user-follower.model';
 import {IActivity, IActivityModel} from "../activity/activity.model";
 import {IActivityUser, IActivityUserModel, ActivityUser} from "../activity-user/activity-user.model";
+import {ActivityUserOperations} from "../activity-user/activity-user.operations"
 import {ActivityOperations} from "../activity/activity.operations";
 import * as Q from 'q';
 import {UserOperations} from "../user/user.operations";
@@ -11,11 +12,6 @@ class UserFollowerOp extends ApiCtrl<IUserFollowerModel, UserFollower> {
   constructor() {
     super(UserFollowerModel)
   }
-
-  public getUsersActivites(userId: string): Q.Promise<IActivity[]> {
-    return this.getActivitiesBy({userId: userId, isRecommendation: false});
-  }
-
   public getUsersFollowers(userId: string): Q.Promise<IUserModel[]> {
     return this.getUsersBy({ userId: userId })
   }
@@ -30,16 +26,6 @@ class UserFollowerOp extends ApiCtrl<IUserFollowerModel, UserFollower> {
       return UserOperations.getBy({userId: {$in: user.map(item => item.userId)}})
       .then((users: IUserModel[]) => {
         return users
-      })
-    })
-  }
-
-  private getActivitiesBy(params: Object): Q.Promise<IActivity[]> {
-    return super.getBy(params)
-    .then((activityUsers: IUserFollowerModel[]) => {
-      return ActivityOperations.getBy({userId: {$in: activityUsers.map(item => item.userId)}})
-      .then((activities: IActivityModel[]) => {
-        return activities
       })
     })
   }
