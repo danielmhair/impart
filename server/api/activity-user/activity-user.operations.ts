@@ -14,6 +14,7 @@ class ActivityUserOp extends ApiCtrl<IActivityUserModel, ActivityUser> {
       console.log("THIS PART WORKED: " + activityUsers)
       return ActivityOperations.getBy({userId: {$in: activityUsers.map(item => item.userId)}})
       .then((activities: IActivityModel[]) => {
+      	console.log("SO DID THIS PART: " + activities)
         return activities
       })
     })
