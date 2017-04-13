@@ -84,38 +84,47 @@ export class UserController {
     })
   };
 
-   public static createSuggestionFromSuggestion(userId: string, suggestion: Suggestion) {
-     return Q.Promise ((resolve, reject) => {
+   public static createSuggestionFromActivity (userId: string, activity: Activity) {
+     return Q.Promise (async(resolve, reject) => {
        console.log("CREATING SUGGESTION FROM SUGGESTION");
        console.log("THIS USER IS LOOKING AT A SUGGESTION: " + userId + ": ");
-       console.log(suggestion);
+       console.log(activity);
+       const duplicate = await ActivityOperations.getById(activity._id)
+       if(!duplicate){
+          //create a new Activity here in this place
+           console.log("Needed to create a brand new Activity")
+           ActivityOperations.create(activity)
+           .then((createdActivity: IActivity) => {
+           console.log(createdActivity);})
+           .catch((err) => reject({status: 500, err: err}));
+       }
        UserOperations.getById(userId)
        .then(async (user: IUserModel) => {
           if (!user) return reject({status: 404, message: "Unable to get user with id: " + userId + "to create acivity-user"})
           const activities: IActivity[] = await ActivityUserOperations.getUsersActivities({userId: userId, isRecommendation: false});
           console.log(activities);
           //check if there is already a relation between the user and this activity.
-          let exists = activities.filter((activity: IActivity) => {
-            return activity._id == suggestion.activity._id
+          let exists = activities.filter((eactivity: IActivity) => {
+            return activity._id == eactivity._id
           }).length > 0;
 
           //make sure one or more of the categories also match.
           let matches = user.categories.filter((eaCategory) => {
-            return suggestion.activity.categories.indexOf(eaCategory) >= 0
+            return activity.categories.indexOf(eaCategory) >= 0
           }).length > 0;
 
           console.log("Exists? " + exists);
           console.log("Matches? " + matches);
           // if the user is not already associated with the activity, and the activity matches one or more of his categories
           if (!exists && matches) {
-            const activityUser: IActivityUser = new ActivityUser(suggestion.activity._id, userId, false);
+            const activityUser: IActivityUser = new ActivityUser(activity._id, userId, false);
             //create the connection between user and activity
             ActivityUserOperations.create(activityUser)
             .then((document: IActivityUserModel) => resolve(document))
             .catch((err) => reject({status: 500, err: err}));
           } else {
             console.log("SUGGESTION THROWN OUT BECAUSE IT ALREADY EXISTS OR DOESN'T MATCH ANY CATEGORIES");
-            return resolve(suggestion)
+            return resolve(activity)
           }
        })
        .catch(err => {
@@ -125,7 +134,7 @@ export class UserController {
      });
    };
 
-  public static createSuggestionFromActivity(userId, activity: Activity) {
+  /*public static createSuggestionFromActivity(userId, activity: Activity) {
      return Q.Promise((resolve, reject) => {
        UserOperations.getById(userId)
        .then((user: IUser) => { // <= Verify the user exists...
@@ -148,7 +157,7 @@ export class UserController {
        })
        .catch((err) => reject({status: 500, err: err}));
     });
-  };
+  };*/
 
   public static createSuggestionReq(req, res) {
     //if the message coming in is a rumor do something
@@ -180,6 +189,7 @@ export class UserController {
         res.status(200).json(result)
       })
       .catch((err) => {
+        console.log(err);
         res.status(500).json(err)
       })
     })
