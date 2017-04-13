@@ -51,7 +51,7 @@ export class UserController {
       UserOperations.getById(followerId)
       .then((userWithWant: IUser) => {
         if (!userWithWant) return reject({status: 404, message: "Unable to get user"});
-        UserOperations.getBy({nodeEndpoint: want.endpoint})
+        UserOperations.getBy({userId: want.userId})
         .then(async (usersWithActivities: IUserModel[]) => {
           let userWithActivity: IUserModel = null;
           if (!usersWithActivities || usersWithActivities.length > 0) {
@@ -151,8 +151,8 @@ export class UserController {
   };
 
   public static createSuggestionReq(req, res) {
-    //if the message coming in is a rumor do something
-    console.log("======================== CREATE RUMOR REQ =========================");
+    //if the message coming in is a suggestion do something
+    console.log("======================== CREATE SUGGESTION REQ =========================");
     let activity: Activity = req.body.activity;
     let want: Want = req.body.want;
     let userId: string = req.params.id;
@@ -189,7 +189,7 @@ export class UserController {
     * Creates a new user
     */
   public static create(req, res, next) {
-    console.log("create");
+    console.log("creating a new user");
     const username = req.body.username;
     const name = req.body.name;
     const newUser: User = new User(username, name);
@@ -210,7 +210,7 @@ export class UserController {
       return res.status(200).json({token: token});
     })
     .catch((err) => {
-      console.log("probably right here");
+      console.log("error creating a new user");
       console.log(err);
       return res.status(500).json(err);
     })
@@ -298,7 +298,7 @@ export class UserController {
       console.log("current user: ");
       console.log(user);
       console.log("username: " + user.username);
-      console.log("user endpoint: " + user.nodeEndpoint);
+      console.log("user id: " + user._id);
       console.log("followers:");
       console.log(followers);
       console.log("activities");
@@ -352,8 +352,9 @@ export class UserController {
           .catch(console.error);
         } else {
           // Prepare a want
-          const want = new Want(user.categories, user.nodeEndpoint);
-          console.log("Sending random want to...");
+          const want = new Want(user.categories, user._id);
+          console.log("Sending random want to follower...");
+          console.log(want);
           console.log(follower);
           UserController.createSuggestionFromWant(follower._id, want)
           .then(console.log)
