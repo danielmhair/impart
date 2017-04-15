@@ -1,3 +1,9 @@
+import {ServerSettings} from "./ServerSettings";
+import { connection } from 'mongoose';
+import * as connectMongo from 'connect-mongo'
+import * as session from 'express-session';
+const mongoStore = connectMongo(session);
+
 const databaseName = "impart";
 const databaseType = "mongodb";
 
@@ -16,5 +22,14 @@ export const DatabaseSettings = {
         autoIndex: false
       }
     }
+  },
+  passport: {
+    secret: ServerSettings.secrets.session,
+    resave: true,
+    saveUninitialized: true,
+    store: new mongoStore({
+      mongooseConnection: connection,
+      db: databaseName
+    })
   }
 };

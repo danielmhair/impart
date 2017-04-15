@@ -2,6 +2,7 @@ import { Model, Document } from 'mongoose';
 import * as Q from 'q';
 import * as _ from 'lodash';
 import {BaseDocument} from "../models/BaseDocument";
+import {DocumentQuery} from "mongoose";
 
 export interface ApiModel<T extends Document> extends Model<T> {}
 export class ApiCtrl<T extends Document, U extends BaseDocument> {
@@ -20,13 +21,8 @@ export class ApiCtrl<T extends Document, U extends BaseDocument> {
     })
   }
 
-  public getById(id: string): Q.Promise<T> {
-    return Q.Promise<T>((resolve, reject) => {
-      this.Collection.findById(id, (err, document: T) => {
-        if (err) return reject(err);
-        return resolve(document)
-      });
-    })
+  public getById(id: string): DocumentQuery<T, T> {
+    return this.Collection.findById(id);
   }
 
   public getBy(params: Object): Q.Promise<T[]> {

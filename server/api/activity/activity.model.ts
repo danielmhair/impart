@@ -34,6 +34,14 @@ export class Activity extends BaseDocument {
   }
 }
 
+export interface IActivityModel extends Document {
+  name: string;
+  description: string;
+  address: Address;
+  categories: string[];
+  event: Object;
+}
+
 let ActivitySchema = new Schema({
   // _id is already included
   // userId: String, // This is a mongo id
@@ -48,5 +56,4 @@ let ActivitySchema = new Schema({
   event: {}
 }, { collection: 'Activity' });
 
-export interface IActivityModel extends Document {}
 export const ActivityModel = model('Activity', ActivitySchema);

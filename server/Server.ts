@@ -13,16 +13,16 @@ import * as https from 'https';
 import * as http from 'http';
 import * as fs from 'fs';
 import * as ejs from 'ejs'
-import { connection } from 'mongoose';
 import * as compression from 'compression';
 import * as methodOverride from 'method-override';
 import * as cookieParser from 'cookie-parser';
 import * as passport from 'passport';
-import * as session from 'express-session';
-import * as connectMongo from 'connect-mongo'
 import * as favicon from 'serve-favicon';
+import * as session from 'express-session';
+declare module 'mongoose' {
+  type Promise<T> = Q.Promise<T>;
+}
 
-const mongoStore = connectMongo(session);
 
 // Your own modules
 import { DatabaseSettings } from './config/DatabaseSettings';
@@ -126,15 +126,7 @@ export class Server {
 
     // Persist sessions with mongoStore
     // We need to enable sessions for passport twitter because its an oauth 1.0 strategy
-    this.app.use(session({
-      secret: ServerSettings.secrets.session,
-      resave: true,
-      saveUninitialized: true,
-      store: new mongoStore({
-        mongooseConnection: connection,
-        db: 'foursquare-integration'
-      })
-    }));
+    this.app.use(session(DatabaseSettings.passport));
   }
 
   /**
