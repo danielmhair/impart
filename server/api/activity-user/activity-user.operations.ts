@@ -11,8 +11,8 @@ class ActivityUserOp extends ApiCtrl<IActivityUserModel, ActivityUser> {
    public getUsersActivities(params: Object): Q.Promise<IActivity[]> {
     return super.getBy(params)
     .then((activityUsers: IActivityUserModel[]) => {
-      console.log("THIS PART WORKED: " + activityUsers)
-      console.log(activityUsers.map(item => item.activityId))
+      console.log("THIS PART WORKED: " + activityUsers);
+      console.log(activityUsers.map(item => item.activityId));
       return ActivityOperations.getBy({_id: {$in: activityUsers.map(item => item.activityId)}})
       .then((activities: IActivityModel[]) => {
       	console.log("SO DID THIS PART: " + activities)

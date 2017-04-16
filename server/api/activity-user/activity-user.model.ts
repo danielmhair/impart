@@ -7,13 +7,13 @@ export interface IActivityUser extends BaseDocument {
   isRecommendation: boolean;
 }
 
-export class ActivityUser extends BaseDocument {
+export class ActivityUser implements IActivityUser {
+  public _id: string;
   public activityId: string;
   public userId: string;
   public isRecommendation: boolean;
 
-  constructor(activityId: string, userId: string, isRecommendation: boolean, id?: string) {
-    super(id);
+  constructor(activityId: string, userId: string, isRecommendation: boolean) {
     this.activityId = activityId;
     this.userId = userId;
     this.isRecommendation = isRecommendation;
@@ -21,14 +21,12 @@ export class ActivityUser extends BaseDocument {
 }
 
 export interface IActivityUserModel extends Document {
-  _id: string;
   activityId: string;
   userId: string;
   isRecommendation: boolean;
 }
 
 export const ActivityUserSchema = new Schema({
-  // _id is already included
   activityId: String,
   userId: String,
   isRecommendation: Boolean,
