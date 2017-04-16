@@ -5,7 +5,8 @@ import { UserActivityStream } from "../services/user-activity-stream.service";
 import {User} from "../models/User";
 import {Router} from "@angular/router";
 import {EventfulCategory} from "../models/EventfulCategory";
-import {Observable} from "rxjs";
+import {Observable, BehaviorSubject} from "rxjs";
+import {Eventful} from "../services/eventful.service";
 
 @Component({
   selector: 'account',
@@ -20,10 +21,10 @@ export class AccountComponent implements OnInit {
   public newCategoryVal: string;
   public error: any = null;
   public user: User;
-  public categories: EventfulCategory[] = [];
-  public filteredCategories: Observable<EventfulCategory[]>
+  public categories: EventfulCategory[] = null;
+  public filteredCategories: Observable<EventfulCategory[]>;
 
-  constructor(private fb: FormBuilder, public userActivityStream: UserActivityStream,
+  constructor(private fb: FormBuilder, public eventful: Eventful,
               private userService: UserService, private router: Router) {}
 
   ngOnInit() {
@@ -32,7 +33,19 @@ export class AccountComponent implements OnInit {
       'newCategory': [""]
     });
 
-    this.userActivityStream.getCategories().then(categories => this.categories = categories);
+    this.eventful.getCategories()
+    .then(console.log)
+    .catch(console.error);
+
+    this.eventful.categories.subscribe((categories: EventfulCategory[]) => {
+      if (this.user) {
+        categories = categories.map(category => {
+          category.selected = this.user.categories.indexOf(category.id) >= 0;
+          return category
+        })
+      }
+      this.categories = categories
+    });
 
     this.message = this.accountForm.controls['message'];
     this.message.valueChanges
@@ -47,19 +60,32 @@ export class AccountComponent implements OnInit {
     if (!this.userService.isAuthenticated()) {
       this.router.navigate(['/login']);
     }
-    this.userService.userStream.subscribe(user => this.user = user);
-    this.userService.getUser()
+    this.userService.userStream.subscribe(user => {
+      this.user = user;
+      if (this.user && this.user.categories && this.categories) {
+        this.categories = this.categories.map(category => {
+          category.selected = this.user.categories.indexOf(category.id) >= 0;
+          return category
+        })
+      }
+    });
+    this.userService.getUser().then(console.log).catch(console.error);
   }
 
   private filterCategories(val: string) {
-    return val ? this.categories.filter((s: EventfulCategory) => new RegExp(`^${val}`, 'gi').test(s.name)) : this.categories;
+    return val ? this.categories.filter(
+      (s: EventfulCategory) => new RegExp(`^${val}`, 'gi').test(s.name)
+    ) : this.categories;
   }
 
-
-  addCategory(category: string) {
-    if (!this.user.categories) {
-      this.user.categories = []
+  public updateCategories(category: EventfulCategory) {
+    const idx = this.user.categories.indexOf(category.id)
+    if (idx >= 0) {
+      this.user.categories.splice(idx, 1);
+    } else {
+      this.user.categories.push(category.id)
     }
-    this.user.categories.push(this.newCategoryVal)
+    this.userService.updateUser(this.user)
+    .then(console.log).catch(console.error);
   }
 }

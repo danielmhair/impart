@@ -1,3 +1,5 @@
+@import '../../styles/app.variables';
+
 .eventful-badge,
 .eventful-badge * {
   margin: 0             !important;
@@ -29,4 +31,14 @@
   width: 100px          !important;
   font-size: 11px       !important;
   line-height: 11px     !important;
+}
+
+.category-card {
+  margin: 5px 5px 5px 0;
+  padding: 10px 0 10px 0;
+}
+
+.category-card:hover {
+  color: $text-primary;
+  background-color: $bg-primary;
 }

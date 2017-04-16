@@ -28,6 +28,7 @@ import { UserService } from './services';
 import { AuthHttp } from './services/auth-http.service';
 import { LoggedInGuard } from "./models/logged-in.guard";
 import { UserActivityStream } from "./services/user-activity-stream.service";
+import { Eventful } from "./services/eventful.service"
 
 export function newHttpService(backend: XHRBackend, defaultOptions: RequestOptions) {
   return new AuthHttp(backend, defaultOptions);
@@ -56,6 +57,7 @@ export function newHttpService(backend: XHRBackend, defaultOptions: RequestOptio
   providers: [
     LoggedInGuard,
     UserActivityStream,
+    Eventful,
     { provide: UserService, useClass: UserService },
     { provide: LocationStrategy, useClass: HashLocationStrategy },
     {

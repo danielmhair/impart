@@ -140,7 +140,7 @@ export class Server {
     this.app.use(express.static('../app/build'));
 
     const env = this.app.get('env');
-    this.app.use(favicon(path.join(ServerSettings.root, 'app', 'src', 'favicon.ico')));
+    this.app.use(favicon(path.join(ServerSettings.root, 'src', 'favicon.ico')));
 
     this.app.use('/api/users', UserApi);
     this.app.use('/auth', AuthApi);

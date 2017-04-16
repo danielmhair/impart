@@ -4,6 +4,7 @@ import {User, IUser, IUserModel, UserModel} from './user.model';
 import { ServerSettings } from '../../config/ServerSettings';
 import * as jwt from 'jsonwebtoken';
 import * as uuid from 'node-uuid';
+import * as _ from 'lodash';
 import * as Q from 'q';
 import { Utils } from '../../utils';
 import {HttpRequest} from "../http-request";
@@ -31,6 +32,21 @@ export class UserController {
       res.status(200).json(users);
     });
   };
+
+  // Updates an existing state in the DB.
+  public static update(req, res) {
+    if(req.body._id) { delete req.body._id; }
+    UserModel.findById(req.params.id, function (err, document: IUserModel) {
+      if (err) { return res.status(500).send(err); }
+      if(!document) { return res.status(404).send('Not Found'); }
+      let updated = _.merge(document, req.body);
+      updated.categories = req.body.categories;
+      updated.save(function (err) {
+        if (err) { return res.status(500).send(err); }
+        return res.status(200).json(updated);
+      });
+    });
+  }
 
   // public static getSuggestions(req, res) {
   //   UserModel.findById(req.params.id, (err, user: IUser) => {
@@ -215,7 +231,7 @@ export class UserController {
       return res.status(500).json(err);
     })
   };
- 
+
   /**
    * Get a single user
    */

@@ -33,7 +33,7 @@ export class HttpRequest {
         rejectUnauthorized: false
       }, (error, response, body) => {
         if (error) return reject(error);
-        return resolve({status: response.status, data: body, response: response})
+        return resolve({status: response.toJSON().statusCode, data: body, response: response.toJSON()})
       });
     })
   }

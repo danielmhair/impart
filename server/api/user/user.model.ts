@@ -73,7 +73,7 @@ let UserSchema: Schema = new Schema({
   name: String,
   email: String,
   phone: Number,
-  categories: [],
+  categories: [String],
   username: String,
   role: {
     type: String,
@@ -183,7 +183,7 @@ UserSchema.methods = {
   authenticate: function(plainText) {
     return this.encryptPassword(plainText) === this.hashedPassword;
   },
-  
+
   /**
    * Make salt
    *
@@ -193,7 +193,7 @@ UserSchema.methods = {
   makeSalt: function() {
     return randomBytes(16).toString('base64');
   },
-  
+
   /**
    * Encrypt password
    *

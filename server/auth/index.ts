@@ -3,7 +3,7 @@
 import { Router } from 'express';
 import * as passport from 'passport';
 import { ServerSettings } from '../config/ServerSettings';
-import { User } from '../api/user/user.model';
+import { UserModel } from '../api/user/user.model';
 
 import {LocalPassport} from './local/passport';
 import {FacebookPassport} from './facebook/passport';
@@ -18,11 +18,11 @@ import {GoogleApi} from './google';
 import {FoursquareApi} from './foursquare';
 
 // Passport Configuration
-LocalPassport.setup(User);
-FacebookPassport.setup(User);
-GooglePassport.setup(User);
-TwitterPassport.setup(User);
-FoursquarePassport.setup(User);
+LocalPassport.setup(UserModel);
+FacebookPassport.setup(UserModel);
+GooglePassport.setup(UserModel);
+TwitterPassport.setup(UserModel);
+FoursquarePassport.setup(UserModel);
 
 export const AuthApi = Router();
 

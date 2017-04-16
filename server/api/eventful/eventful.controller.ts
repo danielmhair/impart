@@ -1,6 +1,7 @@
 import { HttpRequest } from "../http-request";
 import { ServerSettings } from "../../config/ServerSettings"
 import {EventfulEvent, EventfulEventParams, EventfulEventResult } from "../../models/Eventful";
+import {Utils} from "../../utils";
 
 export class EventfulCategory {
   id: string;
@@ -10,7 +11,7 @@ export class EventfulCategory {
 
 export class Eventful {
   public static getCategories() {
-    return HttpRequest.get(`http://api.eventful.com/json/categories/list?app_key=${ServerSettings.eventful.applicationKey}`)
+    return HttpRequest.get(`http://api.eventful.com/json/categories/list?app_key=${ServerSettings.eventful.applicationKey}`);
   }
 
   public static getEvents(params: EventfulEventParams) {
@@ -32,14 +33,23 @@ export class EventfulCtrl {
   }
 
   public static getCategories(req, res) {
+    console.log("Getting categories");
     Eventful.getCategories()
-    .then((categories: EventfulCategory[]) => {
-      res.status(200).json(categories);
+    .then((response: {status: number, data: any, response: any}) => {
+      try {
+        const data = JSON.parse(response.data);
+        data.category = data.category.map(category => {
+          category.name = category.name.replace("&amp;", "&");
+          return category;
+        });
+        return res.status(response.status).json(data.category)
+      }
+      catch(e) {
+        console.error("Unable to parse as json");
+        return res.status(200).json(response.data);
+      }
     })
-    .catch(err => {
-      console.error(err);
-      res.status(400).send(err)
-    })
+    .catch(err => res.status(500).json(err))
   }
 
   public static getEvents(req, res) {
@@ -49,7 +59,7 @@ export class EventfulCtrl {
       return res.status(400).send("Bad request: Either the 'keywords', 'location', 'category' or 'date' parameters are required.")
     }
     Eventful.getEvents(req.params)
-    .then((events: EventfulEvent) => res.status(200).json(events))
+    .then((response: {status: number, data: any, response: any}) => res.status(response.status).json(response.data))
     .catch(err => res.status(500).json(err));
   }
 }

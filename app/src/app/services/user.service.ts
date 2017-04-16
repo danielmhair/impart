@@ -22,6 +22,19 @@ export class UserService {
     );
   }
 
+  public updateUser(user: User) {
+    return new Promise((resolve, reject) => {
+      this.http.put(`${Constants.USER_API}/${user._id}`, user)
+      .map(res => res.json())
+      .subscribe(
+        (userUpdated: User) => {
+          console.log("User updated: ", userUpdated);
+          this.userStream.next(userUpdated)
+        }, console.error
+      )
+    })
+  }
+
   public getCurrentUsername() {
     return localStorage.getItem('username');
   }
