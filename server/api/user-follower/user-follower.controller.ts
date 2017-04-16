@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import * as Q from 'q';
 import {UserFollowerOperations} from './user-follower.operations'
 import { IUserFollowerModel, UserFollowerModel, IUserFollower, UserFollower } from './user-follower.model';
 
@@ -14,11 +15,41 @@ export class UserFollowerCtrl {
 
   // Creates a new state in the DB.
   public static create(req, res) {
-    if (req.body.followerId != null) return res.status(404).send('Bad Request: Need followerId')
-     const relation : IUserFollower = new UserFollower(req.body.followerId,req.params.id);
-     UserFollowerOperations.create(relation)
-     .then((document: IUserFollowerModel) => res.status(201).json(document))
-     .catch(err => UserFollowerCtrl.handleError(res, err))
+   //get the userId out of the params
+   //get the followerId out of the body
+   console.log("======================== CREATE RUMOR REQ =========================");
+   let userId: string = req.params.id
+   let followerId: string = req.body.followerId;
+
+   return Q.Promise(async (resolve, reject) => {
+   //get all the users followers.
+    const Userfollowers: IUserFollowerModel[] = await UserFollowerOperations.getUserFollowersById(userId);
+    console.log(Userfollowers)
+    //check to see if the followerId exists in there.
+    let exists = Userfollowers.filter(follower => {
+      console.log(follower.followerId)
+      console.log(followerId)
+      return String(follower.followerId) == String(followerId)
+    }).length > 0
+    console.log(exists)
+    if (exists) {
+      //follower already exists, return 200
+      reject("You are already following this User")
+    } else {
+      //create new follower
+      const userFollower : IUserFollower = new UserFollower(followerId, userId)
+      UserFollowerOperations.create(userFollower)
+      .then((document: IUserFollowerModel) => resolve(document))
+      .catch((err) => reject({status: 500, err: err}));
+    }
+  })
+  .then((result) => {
+      res.status(200).json(result)
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(200).json(err)
+    })
   }
 
   // Updates an existing state in the DB.
