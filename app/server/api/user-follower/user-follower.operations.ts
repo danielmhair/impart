@@ -16,6 +16,9 @@ class UserFollowerOp extends ApiCtrl<IUserFollowerModel, UserFollower> {
     return this.getUsersBy({ userId: userId })
   }
 
+ public getUserFollowersById(userId: string): Q.Promise<IUserFollowerModel[]> {
+    return this.getBy({ userId : userId})
+  }
   public getWhoUsersFollowing(userId: string): Q.Promise<IUserModel[]> {
     return this.getUsersBy({ followerId: userId })
   }
@@ -23,7 +26,7 @@ class UserFollowerOp extends ApiCtrl<IUserFollowerModel, UserFollower> {
   private getUsersBy(params: Object): Q.Promise<IUserModel[]> {
     return this.getBy(params)
     .then((user: IUserFollower[]) => {
-      return UserOperations.getBy({userId: {$in: user.map(item => item.userId)}})
+      return UserOperations.getBy({_id: {$in: user.map(item => item.userId)}})
       .then((users: IUserModel[]) => {
         return users
       })

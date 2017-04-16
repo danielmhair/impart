@@ -18,7 +18,7 @@ import { ActivityOperations } from "../activity/activity.operations";
 import { ActivityUserModel, ActivityUser, IActivityUserModel, IActivityUser } from '../activity-user/activity-user.model';
 import { ActivityUserOperations } from "../activity-user/activity-user.operations";
 
-import { UserFollower, IUserFollower } from '../user-follower/user-follower.model';
+import { UserFollower, IUserFollower, IUserFollowerModel } from '../user-follower/user-follower.model';
 import { UserFollowerOperations } from "../user-follower/user-follower.operations";
 
 export class UserController {
@@ -67,15 +67,13 @@ export class UserController {
       UserOperations.getById(followerId)
       .then((userWithWant: IUser) => {
         if (!userWithWant) return reject({status: 404, message: "Unable to get user"});
-        UserOperations.getBy({userId: want.userId})
-        .then(async (usersWithActivities: IUserModel[]) => {
-          let userWithActivity: IUserModel = null;
-          if (!usersWithActivities || usersWithActivities.length > 0) {
-            return reject({status: 200, data: "No users are not found"});
-          }
-          else {
-            userWithActivity = usersWithActivities[0];
-          }
+        console.log(want.userId)
+         UserOperations.getById(want.userId)
+         .then(async (userWithActivity: IUser) => {
+           //let userWithActivity: IUserModel = null;
+           if (!userWithActivity) {
+             return reject({status: 404, data: "No users are not found"});
+           }
           const activities: IActivity[] = await ActivityUserOperations.getUsersActivities({userId: followerId});
           const activitiesWithMatchingCategories: IActivity[] = activities.filter(activity => {
             return activity.categories.filter(activityCategory => {
@@ -86,11 +84,8 @@ export class UserController {
           if (activitiesWithMatchingCategories.length < 1) {
             return reject({status: 200, data: "No matching categories"});
           }
-          const randomIActivity: IActivity = activitiesWithMatchingCategories[Utils.getRandom(0, activitiesWithMatchingCategories.length)];
-          const randomActivity: Activity = new Activity(randomIActivity.name, randomIActivity.description,
-                                                        randomIActivity.address, randomIActivity.categories,
-                                                        randomIActivity.event, randomIActivity._id);
-          UserController.createSuggestionFromActivity(followerId, randomActivity)
+          const randomActivity: IActivity = activitiesWithMatchingCategories[Utils.getRandom(0, activitiesWithMatchingCategories.length)];
+          UserController.createSuggestionFromActivity(want.userId, randomActivity)
           .then(resolve)
           .catch(err => reject({ status: 500, err: err}));
         })
@@ -118,7 +113,10 @@ export class UserController {
             console.log(activities);
             //check if there is already a relation between the user and this activity.
             let exists = activities.filter((eactivity: IActivity) => {
-              return activity._id == eactivity._id
+              //make sure to check the event ID to see if the user already has the event wrapped in another activity
+               console.log("ACTIVITY ID: " + activity._id)
+               console.log("THE USERS ACTIVITYID: " + eactivity._id)
+               return String(activity._id) == String(eactivity._id)
             }).length > 0;
 
             //make sure one or more of the categories also match.

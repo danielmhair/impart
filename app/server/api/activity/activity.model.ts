@@ -9,11 +9,11 @@ export interface Address {
 
 
 export interface IActivity extends BaseDocument {
-  name?: string;
-  description?: string;
-  address?: Address;
-  categories?: string[];
-  event?: Object;
+  name: string;
+  description: string;
+  address: Address;
+  categories: string[];
+  event: Object;
 }
 
 export class Activity extends BaseDocument {
