@@ -35,7 +35,7 @@ export class LoginComponent implements OnInit {
         this.loading = false;
         if (this.user && this.userService.isAuthenticated()) {
           console.log("User is logged in!");
-          this.router.navigate(["account"]);
+          this.router.navigate(["categories"]);
         }
       }
     );

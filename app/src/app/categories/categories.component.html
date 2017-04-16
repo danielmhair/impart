@@ -1,6 +1,6 @@
 <form [formGroup]="accountForm">
   <h1 *ngIf="user">Welcome, {{ user.name }}!</h1>
-  <md-card>Choose categories that interest you</md-card>
+  <md-card>Choose at least 3 categories that interest you</md-card>
   <div *ngIf="categories; else loadingCategories">
     <div class="col-lg-12 no-padding">
       <div class="col-lg-4 no-padding" *ngFor="let category of categories; let i=index;">

@@ -1,1 +1,23 @@
 @import '../styles/app.variables';
+
+a {
+  color: white !important;
+}
+
+.prev-fab {
+  position: fixed;
+  left: 10px;
+  top: 50vh;
+}
+
+.next-fab {
+  position: fixed;
+  right: 10px;
+  top: 50vh;
+}
+
+.num-text {
+  font-size: 2em;
+  top: 10px;
+  position: relative;
+}

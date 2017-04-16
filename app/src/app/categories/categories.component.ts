@@ -7,13 +7,14 @@ import {Router} from "@angular/router";
 import {EventfulCategory} from "../models/EventfulCategory";
 import {Observable, BehaviorSubject} from "rxjs";
 import {Eventful} from "../services/eventful.service";
+import {Navigation} from "../services/navigation.service";
 
 @Component({
   selector: 'account',
-  templateUrl: './account.component.html',
-  styleUrls: ['./account.component.scss'],
+  templateUrl: './categories.component.html',
+  styleUrls: ['./categories.component.scss'],
 })
-export class AccountComponent implements OnInit {
+export class CategoriesComponent implements OnInit {
   public accountForm: FormGroup;
   public message: AbstractControl;
   public messageVal: string;
@@ -25,7 +26,8 @@ export class AccountComponent implements OnInit {
   public filteredCategories: Observable<EventfulCategory[]>;
 
   constructor(private fb: FormBuilder, public eventful: Eventful,
-              private userService: UserService, private router: Router) {}
+              private userService: UserService, private router: Router,
+              private nav: Navigation) {}
 
   ngOnInit() {
     this.accountForm = this.fb.group({
@@ -42,7 +44,7 @@ export class AccountComponent implements OnInit {
         categories = categories.map(category => {
           category.selected = this.user.categories.indexOf(category.id) >= 0;
           return category
-        })
+        });
       }
       this.categories = categories
     });
@@ -66,7 +68,11 @@ export class AccountComponent implements OnInit {
         this.categories = this.categories.map(category => {
           category.selected = this.user.categories.indexOf(category.id) >= 0;
           return category
-        })
+        });
+        const amtSelected = this.categories.filter(cat => cat.selected).length;
+        this.nav.curRoute.showNext = amtSelected >= 0;
+        this.nav.curRoute.nextNum = amtSelected >= 3 ? 0 : 3 - amtSelected;
+        this.nav.curRoute.disableNext = amtSelected < 3;
       }
     });
     this.userService.getUser().then(console.log).catch(console.error);
