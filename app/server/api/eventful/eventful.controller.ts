@@ -39,7 +39,7 @@ export class EventfulCtrl {
       try {
         const data = JSON.parse(response.data);
         data.category = data.category.map(category => {
-          category.name = Utils.escapeHTML(category.name);
+          category.name = category.name.replace("&amp;", "&");
           return category;
         });
         return res.status(response.status).json(data.category)

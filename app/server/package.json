@@ -47,8 +47,8 @@
     "morgan": "1.7.0",
     "node-uuid": "1.4.8",
     "passport": "0.3.2",
-    "passport-facebook": "2.1.1",
-    "passport-foursquare": "1.0.0",
+    "passport-facebook": "^2.1.1",
+    "passport-foursquare": "^1.0.0",
     "passport-google": "0.3.0",
     "passport-google-oauth": "1.0.0",
     "passport-local": "1.0.0",
@@ -56,6 +56,7 @@
     "passport-twitter": "1.0.4",
     "q": "1.4.1",
     "serve-favicon": "2.4.2",
+    "typings": "^2.1.0",
     "winston": "2.3.0"
   },
   "devDependencies": {
