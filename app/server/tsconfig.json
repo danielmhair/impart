@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "lib": ["es6","dom"],
+	"target": "es6",
+        "noImplicitAny": false,
+        "outDir": "lib",
+        "sourceMap": false,
+        "typeRoots": [
+            "node_modules/@types"
+        ]
+    }
+}
