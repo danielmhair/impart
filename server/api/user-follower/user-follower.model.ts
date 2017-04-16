@@ -1,12 +1,12 @@
 import { Schema, model, Document } from 'mongoose';
 import {BaseDocument} from "../../models/BaseDocument";
 
-export class UserFollower extends BaseDocument {
+export class UserFollower implements IUserFollower {
+  _id: string;
   followerId: string;
   userId: string;
 
-  constructor(followerId: string, userId: string, id?: string) {
-    super(id);
+  constructor(followerId: string, userId: string) {
     this.followerId = followerId;
     this.userId = userId;
   }
