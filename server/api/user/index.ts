@@ -16,7 +16,7 @@ UserApi.get('/me', UserController.me);
 UserApi.post('/:id/suggestions', UserController.createSuggestionReq);
 UserApi.delete('/:id', UserController.destroy);
 
-/*setInterval(async () => {
+setInterval(async () => {
   console.log("Propagating Suggestions");
   await UserController.suggestActivitiesToOtherUsers();
-}, 5000);*/
+}, 5000);

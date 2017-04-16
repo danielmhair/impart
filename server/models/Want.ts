@@ -1,9 +1,9 @@
 export class Want {
   public categories: string[];
-  public endpoint: string;
+  public userId: string;
 
-  constructor(categories: string[], endpoint: string) {
+  constructor(categories: string[], userId: string) {
     this.categories = categories;
-    this.endpoint = endpoint;
+    this.userId = userId;
   }
 }
