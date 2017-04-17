@@ -33,9 +33,9 @@ class FoursquarePassportSetup {
               foursquare: profile._json.response.user
             });
             user.foursquare.token = accessToken;
-            if (user._id) {
-              user.nodeEndpoint = "https://www.danielmhair.com/api/users/" + user._id + "/suggestions";
-            }
+            // if (user._id) {
+            //   user.nodeEndpoint = "https://www.danielmhair.com/api/users/" + user._id + "/suggestions";
+            // }
             user.uuid = uuid.v4();
             console.log(user.foursquare)
             user.save((err) => {
@@ -44,9 +44,9 @@ class FoursquarePassportSetup {
                 done(err, user)
               });
           } else {
-            if (user._id && !user.nodeEndpoint) {
-              user.nodeEndpoint = "https://www.danielmhair.com/api/users/" + user._id + "/suggestions";
-            }
+            // if (user._id && !user.nodeEndpoint) {
+            //   user.nodeEndpoint = "https://www.danielmhair.com/api/users/" + user._id + "/suggestions";
+            // }
             if (!user.uuid) {
               user.uuid = uuid.v4();
             }

@@ -41,8 +41,10 @@ export class UserController {
       if(!document) { return res.status(404).send('Not Found'); }
       let updated = _.merge(document, req.body);
       updated.categories = req.body.categories;
+      updated.markModified('categories');
       updated.save(function (err) {
         if (err) { return res.status(500).send(err); }
+        console.log("saved no erros");
         return res.status(200).json(updated);
       });
     });

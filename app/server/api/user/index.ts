@@ -21,3 +21,4 @@ UserApi.delete('/:id', UserController.destroy);
   console.log("Propagating Suggestions");
   await UserController.suggestActivitiesToOtherUsers();
 }, 5000);*/
+
