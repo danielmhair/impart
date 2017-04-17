@@ -13,6 +13,7 @@ export class User implements IUser {
   categories: string[];
   username: string;
   role: string;
+  location: string;
   // nodeEndpoint: string;
   uuid: string;
   hashedPassword: string;
@@ -24,10 +25,11 @@ export class User implements IUser {
   foursquare: Object;
   authenticate: Function;
 
-  constructor(username: string, name: string, role?: string) {
+  constructor(username: string, name: string, role?: string, location?: string) {
     this.name = name;
     this.username = username;
     this.role = "user";
+    this.location = location;
   }
 }
 
@@ -38,6 +40,7 @@ export interface IUserModel extends Document {
   categories: string[];
   username: string;
   role: string;
+  location: string;
   // nodeEndpoint: string;
   uuid: string;
   hashedPassword: string;
@@ -57,6 +60,7 @@ export interface IUser extends BaseDocument {
   categories: string[];
   username: string;
   role: string;
+  location: string;
   // nodeEndpoint: string;
   uuid: string;
   hashedPassword: string;
@@ -79,6 +83,7 @@ let UserSchema: Schema = new Schema({
     type: String,
     default: 'user'
   },
+  location: String,
   // nodeEndpoint: String,
   uuid: String,
   hashedPassword: String,
