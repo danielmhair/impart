@@ -3,6 +3,7 @@ import * as https from 'https';
 
 import { Router } from 'express';
 import { UserController } from './user.controller';
+import { ActivityUserOperations } from "../activity-user/activity-user.operations";
 import * as Q from 'q'
 
 export const UserApi = Router();
@@ -24,11 +25,11 @@ UserApi.delete('/:id', UserController.destroy);
   await UserController.suggestActivities();
 }, 5000);*/
 
-// Update 
+// Update recommendations
 setInterval(async () => {
-  console.log("Creating Recommendations");
+  console.log("Destroying old recommendations and creating new ones");
   //function one (Andrew)
-  //await UserController.functionOne();
+  //await ActivityUserOperations.destroyRecommendedTrue();
   //function two (Josh)
   await UserController.createRecommendations();
 }, 5000);
