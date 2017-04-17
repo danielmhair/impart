@@ -21,6 +21,9 @@ import { ActivityUserOperations } from "../activity-user/activity-user.operation
 import { UserFollower, IUserFollower, IUserFollowerModel } from '../user-follower/user-follower.model';
 import { UserFollowerOperations } from "../user-follower/user-follower.operations";
 
+import { Eventful } from '../eventful/eventful.controller';
+import { EventfulEvent, EventfulEventParams } from '../../models/Eventful';
+
 export class UserController {
   /**
    * Get list of users
@@ -57,12 +60,48 @@ export class UserController {
   //     return res.status(200).json(user.suggestions)
   //   });
   // };
+  // public static getActivities(req, res) {
+  //   UserModel.findById(req.params.id, (err, user: IUser) => {
+  //     if (err) return res.status(500).send(err);
+  //     if (!user) return res.status(404).send("Unable to get user");
+  //     return res.status(200).json(user.activities)
+  //   });
+  // };
+
+  /*
+   * Query Eventful with a location (city, state UT), categories (string = categories with commas), date (string = This Week)
+   * Take the results and create an Activity and ActivityUser Connection
+  */
+  public static createRecommendations = async () => {
+    //For each user query eventful
+    const users: IUserModel[] = await UserOperations.getAll();
+    users.forEach( async (user: IUserModel) => {
+      console.log("user");
+      console.log(user.username);
+
+      //query eventful
+      const eventfulEventParams: EventfulEventParams = new EventfulEventParams(/*user.location*/"Provo,UT", "This Week", user.categories.join(',').toString());
+      const response: any = await Eventful.getEvents(eventfulEventParams);
+      console.log(response);
+      
+      // Create an activity for each event that was returned
+      const events: any[] = response.events;
+      events.forEach( async (event: any) => {
+        // I think we should store the start, end time and all day true or false, the event id. 
+        const activity: IActivity = new Activity(event.title, event.description, event.venue_address, [], event);
+        ActivityOperations.create(activity);
+
+        //Create activity user
+        const activityUser: IActivityUser = new ActivityUser(activity._id, user._id, true);
+        ActivityUserOperations.create(activityUser);
+
+      });
+    });
+  }
 
   /** createSuggestionFromWant
    * Check the categories in the want and compare it to all the user's activities
    * send a random one that matches
-   * Look at Andrew's matches
-     public static suggestActivitiesToOtherUsers = async () => {
    */
   public static createSuggestionFromWant(followerId: string, want: Want) {
     return Q.Promise((resolve, reject) => {
@@ -303,7 +342,7 @@ export class UserController {
     res.redirect('/');
   };
 
-  public static suggestActivitiesToOtherUsers = async () => {
+  public static suggestActivities = async () => {
     const users: IUserModel[] = await UserOperations.getAll();
     users.forEach( async (user: IUserModel) => {
 
