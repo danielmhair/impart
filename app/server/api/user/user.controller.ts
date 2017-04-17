@@ -81,20 +81,35 @@ export class UserController {
 
       //query eventful
       const eventfulEventParams: EventfulEventParams = new EventfulEventParams(/*user.location*/"Provo,UT", "This Week", user.categories.join(',').toString());
-      const response: any = await Eventful.getEvents(eventfulEventParams);
-      console.log(response);
-      
-      // Create an activity for each event that was returned
-      const events: any[] = response.events;
-      events.forEach( async (event: any) => {
-        // I think we should store the start, end time and all day true or false, the event id. 
-        const activity: IActivity = new Activity(event.title, event.description, event.venue_address, [], event);
-        ActivityOperations.create(activity);
+      Eventful.getEvents(eventfulEventParams)    
+      .then((response: {status: number, data: any, response: any}) => {
+        const eventfulResponse = JSON.parse(response.data);
+        const events = eventfulResponse.events;
+        //Create an activity for each event that was returned
+        //console.log(events);
+        events.event.forEach( async (event: any) => {
+          // I think we should store the start, end time and all day true or false, the event id. 
+          // console.log("===================EVENT=============================")
+          // console.log(event);
+          const activity: IActivity = new Activity(event.title, event.description, event.venue_address, [], event);
+          ActivityOperations.create(activity)
+          .then((activity: IActivity) => {
+            console.log(activity);
+          })
+          .catch((err) => {
+            console.log("error creating activity");
+            console.log(err);
+          });
 
-        //Create activity user
-        const activityUser: IActivityUser = new ActivityUser(activity._id, user._id, true);
-        ActivityUserOperations.create(activityUser);
+          //Create activity user
+          const activityUser: IActivityUser = new ActivityUser(activity._id, user._id, true);
+          ActivityUserOperations.create(activityUser);
 
+        });
+      })
+      .catch((err) => {
+        console.log("error getting eventful events");
+        console.log(err);
       });
     });
   }
