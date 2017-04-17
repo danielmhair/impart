@@ -328,7 +328,7 @@ export class UserController {
 
         // Find the user that matches the random follower id
         const followerArray: IUserModel[] = users.filter((follower: IUserModel) => {
-          return follower._id == randomFollower._id;
+          return String(follower._id) == String(randomFollower._id);
         });
 
         // Safety check that there is a follower in the array
