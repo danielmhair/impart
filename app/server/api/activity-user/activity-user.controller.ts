@@ -61,7 +61,11 @@ export class ActivityUserCtrl {
       });
     });
   }
-
+  public static removeRecommendations() {
+    ActivityUserOperations.destroyRecommendedTrue()
+    .then((results) => "Successfully deleted all activity recommendations")
+    .catch((err) => console.log(err))
+  }
   // Deletes a state from the DB.
   public static destroy(req, res) {
     ActivityUserModel.find({ _id: req.params.id }).remove(function(err) {
