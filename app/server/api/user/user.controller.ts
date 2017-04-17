@@ -111,9 +111,11 @@ export class UserController {
           //check if there is already a relation between the user and this activity.
           let exists = activities.filter((eactivity: IActivity) => {
             //make sure to check the event ID to see if the user already has the event wrapped in another activity
-             console.log("ACTIVITY ID: " + activity._id)
-             console.log("THE USERS ACTIVITYID: " + eactivity._id)
-             return String(activity._id) == String(eactivity._id)
+             if(activity.event){
+               return String(activity.event.id) == String(eactivity.event.id)
+             } else {
+               return String(activity._id) == String(eactivity._id)
+             }
           }).length > 0;
 
           //make sure one or more of the categories also match.
