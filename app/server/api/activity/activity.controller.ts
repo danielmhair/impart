@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import { ActivityModel, IActivity } from './activity.model';
+import { ActivityUserOperations }  from '../activity-user/activity-user.operations'
 
 export class ActivityCtrl {
   // Get list of clients
@@ -17,6 +18,11 @@ export class ActivityCtrl {
       if(err) { return ActivityCtrl.handleError(res, err); }
       return res.status(201).json(document);
     });
+  }
+
+  public static getActivities = async(req, res) => {
+    let userId = req.params.id
+    const activities: IActivity[] = await ActivityUserOperations.getUsersActivities({userId: userId, isRecommendation: false});
   }
 
   // Updates an existing state in the DB.

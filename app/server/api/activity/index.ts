@@ -7,6 +7,7 @@ export const ActivityApi = Router();
 
 ActivityApi.get('/', /*authenticated, */ActivityCtrl.index);
 ActivityApi.post('/', /*authenticated, */ActivityCtrl.create);
+ActivityApi.get('/:id', /*authenticated, */ActivityCtrl.getActivities);
 ActivityApi.put('/:id', /*authenticated, */ActivityCtrl.update);
 ActivityApi.patch('/:id', /*authenticated, */ActivityCtrl.update);
 ActivityApi.delete('/:id', /*authenticated, */ActivityCtrl.destroy);
