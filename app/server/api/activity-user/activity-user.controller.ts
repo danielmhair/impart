@@ -41,7 +41,11 @@ export class ActivityUserCtrl {
          .catch((err) => reject({ status: 500, err: err }))
        })
        .catch((err) => reject({status: 500, err: err}));
-    });
+    })
+    .then((results) => { 
+      console.log("here")
+      return res.status(200).json("OK")})
+    .catch((err) => {return res.status(500).json(err)})
   }
 
   // Updates an existing state in the DB.
