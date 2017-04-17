@@ -17,8 +17,18 @@ UserApi.get('/me', UserController.me);
 UserApi.post('/:id/suggestions', UserController.createSuggestionReq);
 UserApi.delete('/:id', UserController.destroy);
 
+//UserApi.get('/:id/activities', UserController.getActivities);
+
 /*setInterval(async () => {
   console.log("Propagating Suggestions");
-  await UserController.suggestActivitiesToOtherUsers();
+  await UserController.suggestActivities();
 }, 5000);*/
 
+// Update 
+setInterval(async () => {
+  console.log("Creating Recommendations");
+  //function one (Andrew)
+  //await UserController.functionOne();
+  //function two (Josh)
+  await UserController.createRecommendations();
+}, 5000);
