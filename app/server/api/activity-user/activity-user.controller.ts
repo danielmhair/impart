@@ -1,5 +1,12 @@
 import * as _ from 'lodash';
-import { ActivityUserModel, IActivityUser } from './activity-user.model';
+import * as Q from 'q';
+import { ActivityUserModel, IActivityUser, IActivityUserModel, ActivityUser } from './activity-user.model';
+import { ActivityUserOperations } from "../activity-user/activity-user.operations";
+import { IActivityModel, ActivityModel, IActivity, Activity } from '../activity/activity.model';
+import { ActivityOperations } from "../activity/activity.operations";
+import { User, IUser } from "../user/user.model"
+import { UserOperations } from "../user/user.operations"
+
 
 export class ActivityUserCtrl {
   public static index(req, res) {
@@ -11,10 +18,29 @@ export class ActivityUserCtrl {
 
   // Creates a new state in the DB.
   public static create(req, res) {
-    if (req.body._id == null) delete req.body._id;
-    ActivityUserModel.create(req.body, function(err, document: IActivityUser) {
-      if(err) { return ActivityUserCtrl.handleError(res, err); }
-      return res.status(201).json(document);
+    let userId = req.params.id
+    let activity = req.body.activity
+    return Q.Promise((resolve, reject) => {
+       UserOperations.getById(userId)
+       .then((user: IUser) => { // <= Verify the user exists...
+         if (!user) return reject({status: 404, message: "Unable to get user"});
+         console.log(activity);
+         //create the activity in the database
+         ActivityOperations.create(activity)
+         .then((createdActivity: IActivity) => {
+           console.log(createdActivity);
+           //using the resulting document create the activity-user connection
+           const activityUser: IActivityUser = new ActivityUser(createdActivity._id, userId, false);
+           ActivityUserOperations.create(activityUser)
+           .then((createdActivityUser: IActivityUserModel) => {
+             console.log(createdActivityUser);
+             return resolve(createdActivityUser);
+           })
+           .catch((err) => reject({status: 500, err: err}));
+         })
+         .catch((err) => reject({ status: 500, err: err }))
+       })
+       .catch((err) => reject({status: 500, err: err}));
     });
   }
 
