@@ -16,7 +16,8 @@ export interface IActivity extends BaseDocument {
   event: any;
 }
 
-export class Activity extends BaseDocument {
+export class Activity implements IActivity {
+  _id : string;
   name: string = "";
   description: string = "";
   address: Address = {};
@@ -24,8 +25,7 @@ export class Activity extends BaseDocument {
   event: any = {};
 
   constructor(name: string, description: string, address: Address,
-              categories: string[], event: any, id?: string) {
-    super(id);
+              categories: string[], event: any) {
     this.name = name;
     this.description = description;
     this.address = address;
