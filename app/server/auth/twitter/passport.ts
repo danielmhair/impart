@@ -29,9 +29,9 @@ class TwitterPassportSetup {
               provider: 'twitter',
               twitter: profile._json
             });
-            if (user._id && !user.nodeEndpoint) {
-              user.nodeEndpoint = "https://www.danielmhair.com/api/users/" + user._id + "/suggestions";
-            }
+            // if (user._id && !user.nodeEndpoint) {
+            //   user.nodeEndpoint = "https://www.danielmhair.com/api/users/" + user._id + "/suggestions";
+            // }
             if (!user.uuid) {
               user.uuid = uuid.v4();
             }
@@ -41,9 +41,9 @@ class TwitterPassportSetup {
             });
           } else {
             user.twitter = profile._json;
-            if (user._id && !user.nodeEndpoint) {
-              user.nodeEndpoint = "https://www.danielmhair.com/api/users/" + user._id + "/suggestionss";
-            }
+            // if (user._id && !user.nodeEndpoint) {
+            //   user.nodeEndpoint = "https://www.danielmhair.com/api/users/" + user._id + "/suggestionss";
+            // }
             if (!user.uuid) {
               user.uuid = uuid.v4();
             }

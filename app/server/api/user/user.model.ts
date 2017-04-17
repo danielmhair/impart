@@ -13,7 +13,7 @@ export class User implements IUser {
   categories: string[];
   username: string;
   role: string;
-  nodeEndpoint: string;
+  // nodeEndpoint: string;
   uuid: string;
   hashedPassword: string;
   provider: string;
@@ -38,7 +38,7 @@ export interface IUserModel extends Document {
   categories: string[];
   username: string;
   role: string;
-  nodeEndpoint: string;
+  // nodeEndpoint: string;
   uuid: string;
   hashedPassword: string;
   provider: string;
@@ -57,7 +57,7 @@ export interface IUser extends BaseDocument {
   categories: string[];
   username: string;
   role: string;
-  nodeEndpoint: string;
+  // nodeEndpoint: string;
   uuid: string;
   hashedPassword: string;
   provider: string;
@@ -79,7 +79,7 @@ let UserSchema: Schema = new Schema({
     type: String,
     default: 'user'
   },
-  nodeEndpoint: String,
+  // nodeEndpoint: String,
   uuid: String,
   hashedPassword: String,
   provider: String,
@@ -163,9 +163,9 @@ UserSchema
 UserSchema
 .pre('save', function(next) {
   if (!this.isNew) return next();
-  if (!this.nodeEndpoint) {
-    this.nodeEndpoint = "https://www.danielmhair.com/api/users/" + this._id + "/suggestions";
-  }
+  // if (!this.nodeEndpoint) {
+  //   this.nodeEndpoint = "https://www.danielmhair.com/api/users/" + this._id + "/suggestions";
+  // }
   next()
 });
 

@@ -30,9 +30,9 @@ class FacebookPassportSetup {
                 provider: 'facebook',
                 facebook: profile._json
               });
-              if (user._id && !user.nodeEndpoint) {
-                user.nodeEndpoint = "https://www.danielmhair.com/api/users/" + user._id + "/suggestions";
-              }
+              // if (user._id && !user.nodeEndpoint) {
+              //   user.nodeEndpoint = "https://www.danielmhair.com/api/users/" + user._id + "/suggestions";
+              // }
               if (!user.uuid) {
                 user.uuid = uuid.v4();
               }
@@ -42,9 +42,9 @@ class FacebookPassportSetup {
               });
             } else {
               user.facebook = profile._json;
-              if (user._id && !user.nodeEndpoint) {
-                user.nodeEndpoint = "https://www.danielmhair.com/api/users/" + user._id + "/suggestions";
-              }
+              // if (user._id && !user.nodeEndpoint) {
+              //   user.nodeEndpoint = "https://www.danielmhair.com/api/users/" + user._id + "/suggestions";
+              // }
               if (!user.uuid) {
                 user.uuid = uuid.v4();
               }
