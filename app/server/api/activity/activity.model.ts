@@ -13,7 +13,7 @@ export interface IActivity extends BaseDocument {
   description: string;
   address: Address;
   categories: string[];
-  event: Object;
+  event: any;
 }
 
 export class Activity extends BaseDocument {
@@ -21,10 +21,10 @@ export class Activity extends BaseDocument {
   description: string = "";
   address: Address = {};
   categories: string[];
-  event: Object = {};
+  event: any = {};
 
   constructor(name: string, description: string, address: Address,
-              categories: string[], event: Object, id?: string) {
+              categories: string[], event: any, id?: string) {
     super(id);
     this.name = name;
     this.description = description;
@@ -39,7 +39,7 @@ export interface IActivityModel extends Document {
   description: string;
   address: Address;
   categories: string[];
-  event: Object;
+  event: any;
 }
 
 let ActivitySchema = new Schema({
