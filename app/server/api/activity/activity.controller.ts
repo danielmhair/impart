@@ -23,6 +23,7 @@ export class ActivityCtrl {
   public static getActivities = async(req, res) => {
     let userId = req.params.id
     const activities: IActivity[] = await ActivityUserOperations.getUsersActivities({userId: userId, isRecommendation: false});
+    res.status(200).json(activities);
   }
 
   // Updates an existing state in the DB.
