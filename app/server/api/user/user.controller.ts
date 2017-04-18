@@ -89,22 +89,29 @@ export class UserController {
         //console.log(events);
         events.event.forEach( async (event: any) => {
           // I think we should store the start, end time and all day true or false, the event id. 
-          // console.log("===================EVENT=============================")
+          //console.log("===================EVENT=============================")
           // console.log(event);
           const activity: IActivity = new Activity(event.title, event.description, event.venue_address, [], event);
           ActivityOperations.create(activity)
           .then((activity: IActivity) => {
+            console.log("===================ACTIVITY=============================")
             console.log(activity);
+            //Create activity user
+            const activityUser: IActivityUser = new ActivityUser(activity._id, user._id, true);
+            ActivityUserOperations.create(activityUser)
+            .then((activityUser: IActivityUser) => {
+              console.log("===================ACTIVITY USER=============================")
+              console.log(activityUser);
+            })
+            .catch((err) => {
+              console.log("error creating activity user");
+              console.log(err);
+            });
           })
           .catch((err) => {
             console.log("error creating activity");
             console.log(err);
           });
-
-          //Create activity user
-          const activityUser: IActivityUser = new ActivityUser(activity._id, user._id, true);
-          ActivityUserOperations.create(activityUser);
-
         });
       })
       .catch((err) => {
@@ -421,7 +428,7 @@ export class UserController {
           console.log(randomSuggestion);
           const suggestion: Activity = new Activity(randomSuggestion.name, randomSuggestion.description,
                                           randomSuggestion.address, randomSuggestion.categories,
-                                          randomSuggestion.event, randomSuggestion._id);
+                                          randomSuggestion.event);
           UserController.createSuggestionFromActivity(user._id, suggestion)
           .then(console.log)
           .catch(console.error);

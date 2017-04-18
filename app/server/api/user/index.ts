@@ -29,7 +29,7 @@ UserApi.delete('/:id', UserController.destroy);
 setInterval(async () => {
   console.log("Destroying old recommendations and creating new ones");
   //function one (Andrew)
-  //await ActivityUserOperations.destroyRecommendedTrue();
+  await ActivityUserOperations.destroyRecommendedTrue();
   //function two (Josh)
   await UserController.createRecommendations();
 }, 5000);
