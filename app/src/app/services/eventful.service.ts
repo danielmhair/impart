@@ -3,7 +3,6 @@ import {UserService} from "./user.service";
 import {Http} from "@angular/http";
 import {User} from "../models/User";
 import {ApiStream} from "../services/api/api-stream.service";
-import {UserActivity} from "../models/UserActivity";
 import {Constants} from "../models/Constants";
 import {EventfulCategory} from "../models/EventfulCategory"
 import {BehaviorSubject} from "rxjs";

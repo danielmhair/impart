@@ -7,10 +7,10 @@ export interface Address {
   zip?: string
 }
 
-
 export interface IActivity extends BaseDocument {
   name: string;
   description: string;
+  originalUser: string;
   address: Address;
   categories: string[];
   event: any;
@@ -20,14 +20,16 @@ export class Activity implements IActivity {
   _id : string;
   name: string = "";
   description: string = "";
+  originalUser: string = "";
   address: Address = {};
   categories: string[];
   event: any = {};
 
-  constructor(name: string, description: string, address: Address,
+  constructor(name: string, description: string, address: Address, originalUser: string,
               categories: string[], event: any) {
     this.name = name;
     this.description = description;
+    this.originalUser = originalUser;
     this.address = address;
     this.categories = categories;
     this.event = event;
@@ -37,6 +39,7 @@ export class Activity implements IActivity {
 export interface IActivityModel extends Document {
   name: string;
   description: string;
+  originalUser: string;
   address: Address;
   categories: string[];
   event: any;
@@ -47,6 +50,7 @@ let ActivitySchema = new Schema({
   // userId: String, // This is a mongo id
   name: String,
   description: String,
+  originalUser: String,
   address: {
     city: String,
     street: String,

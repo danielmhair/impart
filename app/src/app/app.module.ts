@@ -26,7 +26,7 @@ import { CategoriesComponent } from "./categories/categories.component";
 import { UserService } from './services';
 import { AuthHttp } from './services/auth-http.service';
 import { LoggedInGuard } from "./models/logged-in.guard";
-import { UserActivityStream } from "./services/user-activity-stream.service";
+import { ActivityStream } from "./services/activity-stream.service";
 import { Eventful } from "./services/eventful.service"
 import { Navigation } from "./services/navigation.service";
 import { ActivitiesComponent } from './activities/activities.component';
@@ -58,7 +58,7 @@ export function newHttpService(backend: XHRBackend, defaultOptions: RequestOptio
   ],
   providers: [
     LoggedInGuard,
-    UserActivityStream,
+    ActivityStream,
     Eventful,
     Navigation,
     { provide: UserService, useClass: UserService },

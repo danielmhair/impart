@@ -1,11 +1,10 @@
 import {Component, OnInit, Input} from '@angular/core';
 import {AbstractControl, FormGroup, FormBuilder} from "@angular/forms";
 import {UserService} from "../services/user.service";
-import { UserActivityStream } from "../services/user-activity-stream.service";
 import {User} from "../models/User";
 import {Router} from "@angular/router";
 import {EventfulCategory} from "../models/EventfulCategory";
-import {Observable, BehaviorSubject} from "rxjs";
+import {Observable} from "rxjs";
 import {Eventful} from "../services/eventful.service";
 import {Navigation} from "../services/navigation.service";
 
@@ -45,6 +44,10 @@ export class CategoriesComponent implements OnInit {
           category.selected = this.user.categories.indexOf(category.id) >= 0;
           return category
         });
+        const amtSelected = categories ? categories.filter(cat => cat.selected).length : 0;
+        this.nav.curRoute.showNext = true;
+        this.nav.curRoute.nextNum = amtSelected >= 3 ? 0 : 3 - amtSelected;
+        this.nav.curRoute.disableNext = amtSelected < 3;
       }
       this.categories = categories
     });
@@ -69,8 +72,8 @@ export class CategoriesComponent implements OnInit {
           category.selected = this.user.categories.indexOf(category.id) >= 0;
           return category
         });
-        const amtSelected = this.categories.filter(cat => cat.selected).length;
-        this.nav.curRoute.showNext = amtSelected >= 0;
+        const amtSelected = this.categories ? this.categories.filter(cat => cat.selected).length : 0;
+        this.nav.curRoute.showNext = true;
         this.nav.curRoute.nextNum = amtSelected >= 3 ? 0 : 3 - amtSelected;
         this.nav.curRoute.disableNext = amtSelected < 3;
       }

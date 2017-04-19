@@ -1,3 +1,64 @@
-<p>
-  activities works!
-</p>
+<ng-template #loading>
+  <md-card class="md-accent">
+    Loading Activities...
+  </md-card>
+</ng-template>
+<div *ngIf="activities.length > 0 && user; else loading">
+  <h1>Activities</h1>
+  <md-card class="margin-bottom-20">
+    <md-card-title>Create an Activity</md-card-title>
+    <md-input-container class="long-input">
+      <input mdInput type="text"
+        name="activityName"
+        (keyup.enter)="addActivity()"
+        placeholder="Name"
+        [formControl]="activityName" />
+    </md-input-container>
+    <br />
+    <md-input-container class="long-input">
+      <input mdInput type="text"
+             name="activityDescription"
+             (keyup.enter)="addActivity()"
+             placeholder="Description"
+             [formControl]="activityDescription" />
+    </md-input-container>
+    <br/>
+    <md-input-container class="long-input">
+    <input mdInput type="text"
+    name="activityCategories"
+    placeholder="Add a category"
+    [formControl]="activityCategories"
+    [mdAutocomplete]="auto" />
+    </md-input-container>
+    
+    <md-autocomplete #auto="mdAutocomplete">
+    <md-option *ngFor="let category of filteredCategories | async" [value]="category.name" (onSelect)="addCategoryToActivity($event)">
+      {{ category.name }}
+    </md-option>
+    </md-autocomplete>
+  
+    <md-chip-list *ngIf="activityCategoriesList">
+      <md-chip *ngFor="let actCategory of activityCategoriesList; let i = index">
+        {{ actCategory.name }} <icon name="fa-remove" class="remove-chip" (click)="removeCategoryFromActivity(i)"></icon>
+      </md-chip>
+    </md-chip-list>
+    <br/>
+    <button md-button type="button" (click)="createActivity()" class="md-accent"><icon name="fa-plus-square"></icon> Create Activity</button>
+  </md-card>
+  
+  <md-card *ngFor="let activity of activities" class="margin-bottom-10">
+    <md-card-title>{{ activity.name }}</md-card-title>
+    <md-card-subtitle>{{ activity.originalUser }}</md-card-subtitle>
+    <img md-card-image *ngIf="event && event.image" [src]="event.image">
+    <md-card-content>
+      <div [innerHTML]="activity.description"></div>
+    </md-card-content>
+    <md-card-actions>
+      <button md-button><icon name="fa-heart"></icon> Like</button>
+      <button md-button type="button" (click)="followerUser(activity)"
+              *ngIf="activity.originalUser !== 'Eventful' && activity.originalUser !== user._id">
+        <icon name="fa-thumbs-o-up"></icon> Follow User
+      </button>
+    </md-card-actions>
+  </md-card>
+</div>

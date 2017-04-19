@@ -1,20 +1,14 @@
 import {BehaviorSubject, Observable, ReplaySubject, Subject} from "rxjs";
 import {UserService} from "../user.service";
 import {Http, Response} from "@angular/http";
-
-export class ApiModel {
-  public id: string;
-
-  constructor(id: string) {
-    this.id = id;
-  }
-}
+import * as Q from 'q';
+import {BaseDocument} from "../../../../server/models/BaseDocument";
 
 export interface IOperation<T> extends Function {
   (data: T[] | any): T[];
 }
 
-export abstract class ApiStream<T extends ApiModel> extends BehaviorSubject<T[]> {
+export abstract class ApiStream<T extends BaseDocument> extends BehaviorSubject<T[]> {
   public abstract baseUrl: string;
 
   public errMessage: string = "";
@@ -46,7 +40,7 @@ export abstract class ApiStream<T extends ApiModel> extends BehaviorSubject<T[]>
       console.log('returning updateStream function...');
       return (curItems: T[]) => {
         return curItems.map((item: T) => {
-          if (item.id == itemToUpdate.id) {
+          if (item._id == itemToUpdate._id) {
             return itemToUpdate;
           }
           return item;
@@ -60,7 +54,7 @@ export abstract class ApiStream<T extends ApiModel> extends BehaviorSubject<T[]>
       return (curItems: T[]) => {
         console.log('Deleting a category via stream.');
         return curItems.filter(eaItem => {
-          return eaItem.id !== item.id;
+          return eaItem._id !== item._id;
         });
       }
     })
@@ -74,7 +68,7 @@ export abstract class ApiStream<T extends ApiModel> extends BehaviorSubject<T[]>
 
   public createItem(itemToCreate: T) {
     this.loading = true;
-    return new Promise<T>((resolve, reject) => {
+    return Q.Promise<T>((resolve, reject) => {
       if (this.userService.isAuthenticated()) {
         this.http.post(`${this.baseUrl}`, itemToCreate)
         .map(res => res.json())
@@ -98,9 +92,9 @@ export abstract class ApiStream<T extends ApiModel> extends BehaviorSubject<T[]>
 
   public deleteItem(itemToDelete: T) {
     this.loading = true;
-    return new Promise<string>((resolve, reject) => {
+    return Q.Promise<string>((resolve, reject) => {
       if (this.userService.isAuthenticated()) {
-        this.http.delete(`${this.baseUrl}/${itemToDelete.id}`)
+        this.http.delete(`${this.baseUrl}/${itemToDelete._id}`)
         .subscribe(
           (res: Response) => {
             if (res.ok) {
@@ -123,7 +117,7 @@ export abstract class ApiStream<T extends ApiModel> extends BehaviorSubject<T[]>
 
   public updateItem(itemToUpdate: T) {
     this.loading = true;
-    return new Promise<T>((resolve, reject) => {
+    return Q.Promise<T>((resolve, reject) => {
       if (this.userService.isAuthenticated()) {
         this.http.put(`${this.baseUrl}`, itemToUpdate)
         .map(res => res.json())
@@ -145,9 +139,9 @@ export abstract class ApiStream<T extends ApiModel> extends BehaviorSubject<T[]>
     })
   }
 
-  public getAll(): Promise<T[]> {
+  public getAll(): Q.Promise<T[]> {
     this.loading = true;
-    return new Promise<T[]>((resolve, reject) => {
+    return Q.Promise<T[]>((resolve, reject) => {
       console.log('Loading current items');
       if (!this.userService.isAuthenticated()) {
         console.error('User not authenticated');
@@ -179,9 +173,9 @@ export abstract class ApiStream<T extends ApiModel> extends BehaviorSubject<T[]>
     })
   }
 
-  public getById(id: string): Promise<T> {
+  public getById(id: string): Q.Promise<T> {
     this.loading = true;
-    return new Promise<T>((resolve, reject) => {
+    return Q.Promise<T>((resolve, reject) => {
       if (!this.userService.isAuthenticated()) {
         console.error('User not authenticated');
         this.loading = false;

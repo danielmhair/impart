@@ -81,17 +81,17 @@ export class UserController {
 
       //query eventful
       const eventfulEventParams: EventfulEventParams = new EventfulEventParams(/*user.location*/"Provo,UT", "This Week", user.categories.join(',').toString());
-      Eventful.getEvents(eventfulEventParams)    
+      Eventful.getEvents(eventfulEventParams)
       .then((response: {status: number, data: any, response: any}) => {
         const eventfulResponse = JSON.parse(response.data);
         const events = eventfulResponse.events;
         //Create an activity for each event that was returned
         //console.log(events);
         events.event.forEach( async (event: any) => {
-          // I think we should store the start, end time and all day true or false, the event id. 
+          // I think we should store the start, end time and all day true or false, the event id.
           //console.log("===================EVENT=============================")
           // console.log(event);
-          const activity: IActivity = new Activity(event.title, event.description, event.venue_address, [], event);
+          const activity: IActivity = new Activity(event.title, event.description, event.venue_address, "Eventful", [], event);
           ActivityOperations.create(activity)
           .then((activity: IActivity) => {
             console.log("===================ACTIVITY=============================")
@@ -427,7 +427,7 @@ export class UserController {
           console.log("Sending random suggestion...");
           console.log(randomSuggestion);
           const suggestion: Activity = new Activity(randomSuggestion.name, randomSuggestion.description,
-                                          randomSuggestion.address, randomSuggestion.categories,
+                                          randomSuggestion.address, user._id, randomSuggestion.categories,
                                           randomSuggestion.event);
           UserController.createSuggestionFromActivity(user._id, suggestion)
           .then(console.log)

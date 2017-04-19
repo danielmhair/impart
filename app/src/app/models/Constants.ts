@@ -5,7 +5,9 @@ export class Constants {
 
   public static AUTH_API: string = `${Constants.DOMAIN}/auth`;
 
-  public static USER_ACTIVITIES_API: string = `${Constants.API_ROOT}/user_activities`;
+  public static USER_ACTIVITIES_API: string = `${Constants.API_ROOT}/activities-users`;
+  public static USER_FOLLOWER_API: string = `${Constants.API_ROOT}/users-followers`;
+  public static ACTIVITIES_API: string = `${Constants.API_ROOT}/activities`;
   public static USER_API: string = `${Constants.API_ROOT}/users`;
   public static EVENTFUL_API: string = `${Constants.API_ROOT}/eventful`;
 

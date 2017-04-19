@@ -22,7 +22,7 @@ export class LoginComponent implements OnInit {
   user: User = null;
   users: User[] = null;
 
-  constructor(private userService: UserService,
+  constructor(public userService: UserService,
               private route: ActivatedRoute,
               private router: Router) {}
 
@@ -35,7 +35,7 @@ export class LoginComponent implements OnInit {
         this.loading = false;
         if (this.user && this.userService.isAuthenticated()) {
           console.log("User is logged in!");
-          this.router.navigate(["categories"]);
+          // this.router.navigate(["categories"]);
         }
       }
     );
@@ -58,6 +58,10 @@ export class LoginComponent implements OnInit {
         this.userService.getUser();
       }
     });
+  }
+
+  public isLoggedIn() {
+    return this.userService.isAuthenticated();
   }
 
   public getExpiration(token_age) {

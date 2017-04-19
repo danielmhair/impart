@@ -1,0 +1,20 @@
+.long-input {
+  width: 45%;
+  margin-right: 50px;
+}
+
+/deep/ .mat-autocomplete-panel {
+  max-width: 100% !important;
+}
+
+/deep/ .remove-chip {
+  font-size: 18px;
+  left: 5px;
+  top: 1px;
+  cursor: pointer;
+  position: relative;
+}
+
+/deep/ md-chip {
+  outline: none !important;
+}

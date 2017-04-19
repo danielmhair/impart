@@ -18,43 +18,40 @@ export class ActivityUserCtrl {
 
   // Creates a new state in the DB.
   public static create(req, res) {
-    let userId = req.params.id
-    let activity = req.body.activity
+    let userId = req.params.id;
+    const activity: Activity = req.body;
     return Q.Promise((resolve, reject) => {
        UserOperations.getById(userId)
        .then((user: IUser) => { // <= Verify the user exists...
          if (!user) return reject({status: 404, message: "Unable to get user"});
          console.log(activity);
          //create the activity in the database
-         ActivityOperations.create(activity)
-         .then((createdActivity: IActivity) => {
+         ActivityModel.create(activity, (err, createdActivity: Activity) => {
+           if (err) return reject({status: 500, err: err });
            console.log(createdActivity);
            //using the resulting document create the activity-user connection
            const activityUser: IActivityUser = new ActivityUser(createdActivity._id, userId, false);
            ActivityUserOperations.create(activityUser)
            .then((createdActivityUser: IActivityUserModel) => {
              console.log(createdActivityUser);
-             return resolve(createdActivityUser);
+             return resolve({ activity: createdActivity, activityUser: createdActivityUser });
            })
            .catch((err) => reject({status: 500, err: err}));
-         })
-         .catch((err) => reject({ status: 500, err: err }))
+         });
        })
        .catch((err) => reject({status: 500, err: err}));
     })
-    .then((results) => { 
-      console.log("here")
-      return res.status(200).json("OK")})
+    .then((results) => {return res.status(200).json(results)})
     .catch((err) => {return res.status(500).json(err)})
   }
 
   // Updates an existing state in the DB.
   public static update(req, res) {
-    if(req.body._id) { delete req.body._id; }
     ActivityUserModel.findById(req.params.id, function (err, document: IActivityUser) {
       if (err) { return ActivityUserCtrl.handleError(res, err); }
-      if(!document) { return res.status(404).send('Not Found'); }
+      if (!document) { return res.status(404).send('Not Found'); }
       var updated = _.merge(document, req.body);
+
       updated.save(function (err) {
         if (err) { return ActivityUserCtrl.handleError(res, err); }
         return res.status(200).json(document);
