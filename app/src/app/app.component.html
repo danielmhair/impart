@@ -1,5 +1,19 @@
 <app-navbar [brand]="brand" [topLinks]="topLinks" [bottomHeading]="bottomHeading" [bottomLinks]="bottomLinks">
+  <a md-fab (click)="nav.navigatePrev()" class="prev-fab"
+            *ngIf="nav.curRoute && nav.curRoute.showPrev"
+            [disabled]="nav.curRoute && nav.curRoute.disablePrev">
+    <icon *ngIf="!nav.leftNum" name="fa-chevron-left" size="md"></icon>
+  </a>
   <div class="container">
     <router-outlet></router-outlet>
   </div>
+  <a md-fab (click)="nav.navigateNext()" class="next-fab"
+     *ngIf="nav.curRoute && nav.curRoute.showNext"
+     [disabled]="nav.curRoute && nav.curRoute.disableNext">
+    <icon *ngIf="!nav.curRoute.disableNext" name="fa-chevron-right" size="md"></icon>
+    <span *ngIf="nav.curRoute && nav.curRoute.disableNext"
+          class="num-text">
+      {{ nav.curRoute && nav.curRoute.disableNext ? nav.curRoute.nextNum + "" : "" }}
+    </span>
+  </a>
 </app-navbar>

@@ -4,6 +4,7 @@ import { Link } from './models/Link';
 import {UserService} from "./services";
 import {MdIconRegistry} from "@angular/material";
 import {DomSanitizer} from "@angular/platform-browser";
+import { Navigation } from "./services/navigation.service";
 
 @Component({
   selector: 'app-root',
@@ -12,7 +13,8 @@ import {DomSanitizer} from "@angular/platform-browser";
 })
 export class AppComponent {
   constructor(public router: Router, private userService: UserService,
-              private iconRegistry: MdIconRegistry, private domSanitize: DomSanitizer) {
+              private iconRegistry: MdIconRegistry, private domSanitize: DomSanitizer,
+              public nav: Navigation) {
     iconRegistry.addSvgIcon("impart", domSanitize.bypassSecurityTrustResourceUrl("assets/img/impart.svg"));
   }
 
@@ -25,7 +27,8 @@ export class AppComponent {
   ];
 
   public topLinks: Link[] = [
-    new Link('My Account', 'fa-user', null, '/account', {}, this.isLoggedIn, this.userService),
+    new Link('Categories', 'fa-user', null, '/categories', {}, this.isLoggedIn, this.userService),
+    new Link('Activities', 'fa-user', null, '/activities', {}, this.isLoggedIn, this.userService),
   ];
 
   isLoggedIn(userService: UserService) {

@@ -9,7 +9,7 @@ export class User {
   google: any;
   twitter: any;
   facebook: any;
-  nodeEndpoint: string;
+  // nodeEndpoint: string;
   uuid: string;
   categories: string[];
 

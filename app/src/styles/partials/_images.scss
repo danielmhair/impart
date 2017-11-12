@@ -1,0 +1,18 @@
+$event-names: 'music', 'conference', 'comedy', 'learning_education', 'family_fun_kids',
+              'festivals_parades', 'movies_film', 'food', 'fundraisers', 'art', 'support',
+              'holiday', 'books', 'attractions', 'community', 'business', 'singles_social',
+              'schools_alumni', 'performing_arts','clubs_associations', 'outdoors_recreation', 'animals',
+              'politics_activism', 'sales', 'science', 'religion_spirituality', 'sports',
+              'technology', 'other';
+
+.avatar {
+  height: 40px !important;
+  width: 40px !important;
+}
+
+@each $name in $event-names {
+  .#{$name}-icon {
+    background-image: url("assets/img/#{$name}-icon.png");
+    background-size: cover;
+  }
+}

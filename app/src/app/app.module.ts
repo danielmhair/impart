@@ -20,14 +20,16 @@ import { LoginComponent } from './login/login.component';
 import { LogoutComponent } from './logout/logout.component';
 import { IconComponent } from './icon/icon.component'
 import { DmhButtonIconComponent } from './dmh-button-icon/dmh-button-icon.component'
-import { AccountComponent } from "./account/account.component";
-
+import { CategoriesComponent } from "./categories/categories.component";
 
 // Services
 import { UserService } from './services';
 import { AuthHttp } from './services/auth-http.service';
 import { LoggedInGuard } from "./models/logged-in.guard";
-import { UserActivityStream } from "./services/user-activity-stream.service";
+import { ActivityStream } from "./services/activity-stream.service";
+import { Eventful } from "./services/eventful.service"
+import { Navigation } from "./services/navigation.service";
+import { ActivitiesComponent } from './activities/activities.component';
 
 export function newHttpService(backend: XHRBackend, defaultOptions: RequestOptions) {
   return new AuthHttp(backend, defaultOptions);
@@ -42,7 +44,8 @@ export function newHttpService(backend: XHRBackend, defaultOptions: RequestOptio
     LogoutComponent,
     IconComponent,
     DmhButtonIconComponent,
-    AccountComponent,
+    CategoriesComponent,
+    ActivitiesComponent,
   ],
   imports: [
     BrowserModule,
@@ -55,7 +58,9 @@ export function newHttpService(backend: XHRBackend, defaultOptions: RequestOptio
   ],
   providers: [
     LoggedInGuard,
-    UserActivityStream,
+    ActivityStream,
+    Eventful,
+    Navigation,
     { provide: UserService, useClass: UserService },
     { provide: LocationStrategy, useClass: HashLocationStrategy },
     {

@@ -4,6 +4,7 @@ import {Constants} from '../models/Constants';
 import {Router} from '@angular/router';
 import {Observable, BehaviorSubject} from 'rxjs';
 import {Http, Response} from "@angular/http";
+import * as Q from 'q';
 
 @Injectable()
 export class UserService {
@@ -22,6 +23,19 @@ export class UserService {
     );
   }
 
+  public updateUser(user: User) {
+    return Q.Promise((resolve, reject) => {
+      this.http.put(`${Constants.USER_API}/${user._id}`, user)
+      .map(res => res.json())
+      .subscribe(
+        (userUpdated: User) => {
+          console.log("User updated: ", userUpdated);
+          this.userStream.next(userUpdated)
+        }, console.error
+      )
+    })
+  }
+
   public getCurrentUsername() {
     return localStorage.getItem('username');
   }
@@ -29,7 +43,7 @@ export class UserService {
   public getUser() {
     this.loading = true;
     let username = this.getCurrentUsername();
-    return new Promise((resolve, reject) => {
+    return Q.Promise((resolve, reject) => {
       if (!username) {
         console.log('Has username?', username);
         this.userStream.error('User is not authenticated');

@@ -1,0 +1,72 @@
+<form [formGroup]="accountForm">
+  <h1 *ngIf="user">Welcome, {{ user.name }}!</h1>
+  <md-card>Choose at least 3 categories that interest you</md-card>
+  <div *ngIf="categories; else loadingCategories">
+    <div class="col-lg-12 no-padding">
+      <div class="col-lg-4 no-padding" *ngFor="let category of categories; let i=index;">
+        <md-card class="category-card"
+                  [class.no-margin-right]="(i+1) % 3 == 0"
+                  [class.md-accent]="category.selected"
+                  (click)="updateCategories(category)">
+          <md-list class="no-padding">
+            <md-list-item>
+              <div md-list-avatar class="{{ category.id }}-icon"></div>
+              <h4 md-line>{{ category.name }}</h4>
+              <span class="right-text" *ngIf="category.selected">
+                <icon name="fa-check" size="md"></icon>
+              </span>
+            </md-list-item>
+          </md-list>
+        </md-card>
+      </div>
+    </div>
+    <!--<md-card>-->
+      <!--<md-input-container>-->
+        <!--<input mdInput type="text"-->
+               <!--name="newCategory"-->
+               <!--(keyup.enter)="addCategory()"-->
+               <!--placeholder="Add a category"-->
+               <!--[formControl]="newCategory"-->
+               <!--[mdAutocomplete]="auto" />-->
+      <!--</md-input-container>-->
+  <!---->
+      <!--<md-autocomplete #auto="mdAutocomplete">-->
+        <!--<md-option *ngFor="let category of filteredCategories | async" [value]="category.id">-->
+          <!--{{ category.name }}-->
+        <!--</md-option>-->
+      <!--</md-autocomplete>-->
+    <!--</md-card>-->
+    <!--<md-card *ngFor="let category of user.categories" class="margin-bottom-10">-->
+      <!--{{ category }}-->
+    <!--</md-card>-->
+  </div>
+  <ng-template #loadingCategories>
+    <md-card class="mat-accent">
+      Loading Categories...
+    </md-card>
+  </ng-template>
+  <!-- Move to another component for activities-->
+  <!--<md-card>Activities</md-card>-->
+  <!--<md-card *ngIf="userActivityStream | async as activities; else loading" class="padding-bottom-50">-->
+    <!--<md-list class="list-group">-->
+      <!--<md-list-item>-->
+        <!--<md-input-container>-->
+          <!--<input mdInput type="text"-->
+                  <!--name="message"-->
+                  <!--(keyup.enter)="sendMessage()"-->
+                  <!--placeholder="Add an activity"-->
+                  <!--[formControl]="message" />-->
+        <!--</md-input-container>-->
+      <!--</md-list-item>-->
+      <!--<md-list-item *ngFor="let activity of activities">-->
+        <!--{{ activity.name }}-->
+      <!--</md-list-item>-->
+    <!--</md-list>-->
+  <!--</md-card>-->
+  <!--<md-progress-bar mode="indeterminate" *ngIf="userActivityStream.loading"></md-progress-bar>-->
+  <!--<div class="eventful-badge eventful-large">-->
+    <!--<img src="http://api.eventful.com/images/powered/eventful_139x44.gif"-->
+         <!--alt="Local Events, Concerts, Tickets">-->
+    <!--<p><a href="http://eventful.com/">Events</a> by Eventful</p>-->
+  <!--</div>-->
+</form>
